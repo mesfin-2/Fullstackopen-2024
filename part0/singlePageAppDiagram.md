@@ -1,5 +1,6 @@
 ```mermaid
 sequenceDiagram
+    title 0.5: Single page app diagram
     participant User
     participant Browser
     participant Server
