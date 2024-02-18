@@ -1,4 +1,4 @@
-```mermaid
+    ```mermaid
     graph LR
     A[User] -->|Writes note| B[Text field]
     B -->|Enters text| C[Save button]
@@ -8,4 +8,4 @@
     F -->|Saves note| E
     E -->|Sends response| D
     D -->|Updates page| A
-```
+    ```
