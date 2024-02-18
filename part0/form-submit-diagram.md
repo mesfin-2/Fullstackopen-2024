@@ -1,6 +1,7 @@
 
 ```mermaid
 sequenceDiagram
+    title 0.4: New note diagram
     participant User
     participant Browser
     participant Server
