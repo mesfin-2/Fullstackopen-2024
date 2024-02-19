@@ -7,9 +7,9 @@ const Statistics = ({ good, neutral, bad }) => {
       <p>good {good}</p>
       <p>neutral {neutral}</p>
       <p>bad {bad}</p>
-      <p>all 9</p>
-      <p>average 0.555555555555556</p>
-      <p>positive 66.6666666666667%</p>
+      <p>all {good + neutral + bad}</p>
+      <p>average {(good - bad) / (good + bad + neutral)}%</p>
+      <p>positive {good / (good + bad + neutral)}%</p>
     </div>
   );
 };
