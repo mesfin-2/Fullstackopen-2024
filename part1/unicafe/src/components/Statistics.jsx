@@ -3,8 +3,8 @@ import StatisticLine from "./StatisticLine";
 
 const Statistics = ({ good, neutral, bad }) => {
   const total = good + neutral + bad;
-  const average = (good - bad) / total + "%";
-  const positivePercentage = (good / total) * 100 + "%";
+  const average = ((good - bad) / total).toFixed(1) + "%";
+  const positivePercentage = ((good / total) * 100).toFixed(1) + "%";
 
   return (
     <div>

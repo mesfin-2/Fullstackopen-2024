@@ -2,11 +2,14 @@ import React from "react";
 
 const StatisticLine = ({ text, value }) => {
   return (
-    <div>
-      <p>
-        {text} {value}
-      </p>
-    </div>
+    <table>
+      <tbody>
+        <tr>
+          <td>{text}</td>
+          <td>{value}</td>
+        </tr>
+      </tbody>
+    </table>
   );
 };
 
