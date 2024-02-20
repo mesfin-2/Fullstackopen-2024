@@ -15,6 +15,8 @@ const App = () => {
   const [selected, setSelected] = useState(0);
   // Initialize the vote state with an array of zeros with the same length as the anecdotes array
   const [vote, setVote] = useState(Array(anecdotes.length).fill(0));
+  const [highestVote, setHighestVote] = useState(0);
+  const [selectedVote, setSelectedVote] = useState(0);
   console.log("vote-before", vote);
 
   const handleRandomSelect = () => {
@@ -26,15 +28,34 @@ const App = () => {
     const updatedVotes = [...vote];
     updatedVotes[selected] += 1;
     setVote(updatedVotes);
-    console.log("vote-after", vote);
+
+    // Find the index of the anecdote with the highest vote count
+    const maxVoteIndex = updatedVotes.indexOf(Math.max(...updatedVotes));
+    setHighestVote(maxVoteIndex);
+
+    // Set the selectedVote to the current selected anecdote if it has the highest vote count
+    if (selected === maxVoteIndex) {
+      setSelectedVote(selected);
+    }
   };
 
   return (
     <div>
-      <p>{anecdotes[selected]}</p>
-      <p>has {vote[selected]} votes</p>
-      <button onClick={handleRandomSelect}>next anecdotes</button>
-      <button onClick={handleVote}>vote</button>
+      <>
+        <h2>Anecdotes of the day</h2>
+        <p>{anecdotes[selected]}</p>
+        <p>has {vote[selected]} votes</p>
+        <button onClick={handleRandomSelect}>next anecdotes</button>
+        <button onClick={handleVote}>vote</button>
+      </>
+      {/* it renders the anecdote with the most votes only if it's different from the currently selected anecdote */}
+      {highestVote !== selected && (
+        <>
+          <h2>Anecdote with most votes</h2>
+          <p>{anecdotes[highestVote]}</p>
+          <p>has {vote[highestVote]} votes</p>
+        </>
+      )}
     </div>
   );
 };
