@@ -4,6 +4,7 @@ import Note from "./components/Note";
 const App = (props) => {
   const [notes, setNotes] = useState(props.notes);
   const [newNote, setNewNote] = useState("");
+  const [showAll, setShowAll] = useState(true);
 
   const addNote = (e) => {
     e.preventDefault();
@@ -22,11 +23,22 @@ const App = (props) => {
   const onNoteChange = (e) => {
     setNewNote(e.target.value);
   };
+
+  const onToggleShow = () => {
+    setShowAll(!showAll);
+  };
+
+  const notesToShow = showAll ? notes : notes.filter((note) => note.important);
   return (
     <div>
       <h1>Notes</h1>
+      <button onClick={onToggleShow}>
+        show {showAll ? "important" : "all"}
+      </button>
       <ul>
-        {notes && notes.map((note) => <Note key={note.id} note={note} />)}
+        {notesToShow.map((note) => (
+          <Note key={note.id} note={note} />
+        ))}
       </ul>
       <form onSubmit={addNote}>
         <input value={newNote} onChange={onNoteChange} />
