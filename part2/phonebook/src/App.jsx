@@ -9,10 +9,17 @@ const App = () => {
     const nameObject = {
       name: newName,
     };
-    setPersons([...persons, nameObject]);
-    //setPersons(persons.concat(nameObject));
-    setNewName("");
-    console.log(persons);
+    //check if the contact is already in there
+    const existedContact = persons.find((person) => person.name === newName);
+    if (existedContact) {
+      alert(`${newName} is already added to phonebook`);
+      setNewName("");
+    } else {
+      setPersons([...persons, nameObject]);
+      //setPersons(persons.concat(nameObject));
+      setNewName("");
+      console.log(persons);
+    }
   };
 
   const onNameChange = (e) => {
