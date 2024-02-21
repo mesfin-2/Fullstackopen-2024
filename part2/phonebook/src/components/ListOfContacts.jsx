@@ -6,7 +6,7 @@ const ListOfContacts = ({ searchResult }) => {
     <div>
       <h3>Numbers</h3>
       {searchResult.map((person) => (
-        <Contact person={person} />
+        <Contact key={person.id} person={person} />
       ))}
     </div>
   );
