@@ -4,6 +4,7 @@ import AddNewContact from "./components/AddNewContact";
 import ListOfContacts from "./components/ListOfContacts";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import personService from "./services/person.js";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -13,8 +14,8 @@ const App = () => {
   const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    personService.getAll().then((initialState) => {
+      setPersons(initialState);
     });
   }, []);
 
@@ -33,8 +34,8 @@ const App = () => {
       id: uuidv4(),
     };
     //make post request to json-server
-    axios.post("http://localhost:3001/persons", nameObject).then((response) => {
-      setNewName([...persons, response.data]);
+    personService.create(nameObject).then((returnedPerson) => {
+      setPersons([...persons, returnedPerson]);
       setNewName("");
       setNewNumber("");
     });
