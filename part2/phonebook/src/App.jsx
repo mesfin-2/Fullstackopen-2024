@@ -21,7 +21,7 @@ const App = () => {
 
   useEffect(() => {
     const search = persons.filter((person) =>
-      person.name.toLowerCase().includes(searchTerm.toLowerCase())
+      person.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setSearchResult(search);
   }, [persons, searchTerm]);
@@ -42,21 +42,51 @@ const App = () => {
 
     //check if the contact is already in there
     const existedContact = persons.find(
-      (person) => person.name.toLowerCase() === newName.toLowerCase()
+      (person) => person.name?.toLowerCase() === newName.toLowerCase()
     );
     if (existedContact) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName("");
-      setNewNumber("");
+      const isConfirmed = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with the new one?`
+      );
+      if (isConfirmed) {
+        // Update the number of the existing contact
+
+        const updateConact = { ...existedContact, number: newNumber };
+        personService
+          .update(existedContact.id, updateConact)
+          .then((returnedPerson) => {
+            // Update the state with the updated contact
+            const updatedPersons = persons.map((person) =>
+              person.id === returnedPerson.id ? returnedPerson : person
+            );
+            setPersons(updatedPersons);
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((error) => {
+            console.error("Error updating contact:", error);
+          });
+      }
     } else {
-      setPersons([...persons, nameObject]);
-      //setPersons(persons.concat(nameObject));
-      setNewName("");
-      setNewNumber("");
-      console.log(persons);
+      // Prompt the user to confirm adding the new contact
+      const isConfirmed = window.confirm(`Add ${newName} to the phonebook?`);
+
+      if (isConfirmed) {
+        // Add the new contact
+        personService
+          .create(nameObject)
+          .then((returnedPerson) => {
+            // Update the state with the new contact
+            setPersons([...persons, returnedPerson]);
+            setNewName("");
+            setNewNumber("");
+          })
+          .catch((error) => {
+            console.error("Error adding contact:", error);
+          });
+      }
     }
   };
-
   const onNameChange = (e) => {
     setNewName(e.target.value);
   };
