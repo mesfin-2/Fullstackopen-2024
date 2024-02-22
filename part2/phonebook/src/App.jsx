@@ -32,6 +32,7 @@ const App = () => {
       number: newNumber,
       id: uuidv4(),
     };
+    //make post request to json-server
     axios.post("http://localhost:3001/persons", nameObject).then((response) => {
       setNewName([...persons, response.data]);
       setNewName("");
