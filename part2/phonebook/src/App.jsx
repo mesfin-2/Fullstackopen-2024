@@ -3,6 +3,7 @@ import Search from "./components/Search";
 import AddNewContact from "./components/AddNewContact";
 import ListOfContacts from "./components/ListOfContacts";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -29,7 +30,14 @@ const App = () => {
     const nameObject = {
       name: newName,
       number: newNumber,
+      id: uuidv4(),
     };
+    axios.post("http://localhost:3001/persons", nameObject).then((response) => {
+      setNewName([...persons, response.data]);
+      setNewName("");
+      setNewNumber("");
+    });
+
     //check if the contact is already in there
     const existedContact = persons.find(
       (person) => person.name.toLowerCase() === newName.toLowerCase()
