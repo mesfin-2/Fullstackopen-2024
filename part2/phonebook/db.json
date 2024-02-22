@@ -6,11 +6,6 @@
       "id": "1"
     },
     {
-      "name": "Ada Lovelace",
-      "number": "111111111111",
-      "id": "2"
-    },
-    {
       "name": "Dan Abramov",
       "number": "12-43-234345",
       "id": "3"
@@ -23,12 +18,12 @@
     {
       "id": "13d585c3-1221-4be1-87ab-403bcaa7030e",
       "name": "Timiro",
-      "number": "9959450"
+      "number": "777"
     },
     {
       "id": "6bbe50fd-df0b-46ce-9286-9c7ea191f176",
       "name": "Nathan",
-      "number": "85747507"
+      "number": "767676"
     },
     {
       "id": "2d16df2f-1e2b-4aac-a051-bc151b79327c",
@@ -130,59 +125,14 @@
       "number": "666666666"
     },
     {
-      "id": "228c8da9-c835-4a7b-bccf-a618def44b90",
-      "name": "Ada Lovelace",
-      "number": "11111111111"
-    },
-    {
-      "id": "24203327-28dd-4265-8950-4a4ab2172736",
-      "name": "Ada Lovelace",
-      "number": "111111111111"
-    },
-    {
       "id": "1939d6ac-f274-4291-a857-1e3fa0ece606",
       "name": "Afe",
       "number": "2222222"
     },
     {
-      "id": "bc3009a5-63c4-4891-98fd-c95a74a7bbee",
-      "name": "Afe",
-      "number": "33333333333333333"
-    },
-    {
-      "id": "55deb417-a928-49fb-9e90-4b8638502c5d",
-      "name": "Gez",
-      "number": "222222"
-    },
-    {
-      "id": "bb1ac942-7eef-47be-a0a4-de0d42af7da9",
+      "id": "3bfbbec2-7a8a-47a3-867a-6743e96c2dab",
       "name": "Gez",
       "number": "33333333"
-    },
-    {
-      "id": "4df6f237-1929-4a37-a510-ea4ef736edfb",
-      "name": "Mesfin",
-      "number": "23233"
-    },
-    {
-      "id": "e4203c58-2906-44a3-92a2-17bd721bfa38",
-      "name": "Mesfin",
-      "number": "666666"
-    },
-    {
-      "id": "e4203c58-2906-44a3-92a2-17bd721bfa38",
-      "name": "Mesfin",
-      "number": "22222"
-    },
-    {
-      "id": "fd468fbc-db5f-4c54-9b18-562cca1ee047",
-      "name": "Mesfin",
-      "number": "666666"
-    },
-    {
-      "id": "d18fc765-d635-4994-a109-b04c71715469",
-      "name": "Hidity",
-      "number": "111111"
     }
   ]
 }

@@ -5,6 +5,7 @@ import ListOfContacts from "./components/ListOfContacts";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import personService from "./services/person.js";
+import Notification from "./components/Notification.jsx";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,6 +13,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("something goes wrong");
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialState) => {
@@ -38,6 +41,10 @@ const App = () => {
       setPersons([...persons, returnedPerson]);
       setNewName("");
       setNewNumber("");
+      setSuccessMessage(`${returnedPerson.name} Added Successfully`);
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 1000);
     });
 
     //check if the contact is already in there
@@ -62,9 +69,13 @@ const App = () => {
             setPersons(updatedPersons);
             setNewName("");
             setNewNumber("");
+            setSuccessMessage(`${returnedPerson.name} Updated Successfully`);
+            setTimeout(() => {
+              setSuccessMessage(null);
+            }, 1000);
           })
           .catch((error) => {
-            console.error("Error updating contact:", error);
+            setErrorMessage("Error updating contact:");
           });
       }
     } else {
@@ -80,9 +91,13 @@ const App = () => {
             setPersons([...persons, returnedPerson]);
             setNewName("");
             setNewNumber("");
+            setSuccessMessage(`${returnedPerson.name} Created Successfully`);
+            setTimeout(() => {
+              setSuccessMessage(null);
+            }, 1000);
           })
           .catch((error) => {
-            console.error("Error adding contact:", error);
+            setErrorMessage("Error updating contact:");
           });
       }
     }
@@ -106,12 +121,17 @@ const App = () => {
       const updatedContacts = persons.filter((person) => person.id !== id);
 
       setPersons(updatedContacts);
+      setSuccessMessage(`${personToDelete.name} Deleted Successfully`);
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 1000);
     }
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage} />
       <Search searchTerm={searchTerm} onSearch={onsearchTermChange} />
       <AddNewContact
         newName={newName}
