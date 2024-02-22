@@ -3,11 +3,14 @@ import Note from "./components/Note";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import noteService from "./services/notes.js";
+import Notification from "./components/Notification.jsx";
+import Footer from "./components/Footer.jsx";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [showAll, setShowAll] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("some error happened...");
 
   useEffect(() => {
     noteService.getAll().then((initialNotes) => {
@@ -61,7 +64,13 @@ const App = () => {
         setNotes(notes.map((n) => (n.id !== id ? n : returnedNote)));
       })
       .catch((error) => {
-        alert(`the note '${note.content}' was already deleted from server`);
+        setErrorMessage(
+          `the note '${note.content}' was already deleted from server`
+        );
+
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
         //deleted note gets filtered out from the state.
         setNotes(notes.filter((n) => n.id !== id));
       });
@@ -73,6 +82,7 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
+      <Notification message={errorMessage} />
       <button onClick={onToggleShow}>
         show {showAll ? "important" : "all"}
       </button>
@@ -90,6 +100,7 @@ const App = () => {
         <input value={newNote} onChange={onNoteChange} />
         <button type="submit">save</button>
       </form>
+      <Footer />
     </div>
   );
 };
