@@ -67,6 +67,17 @@ const App = () => {
   const onsearchTermChange = (e) => {
     setSearchTerm(e.target.value);
   };
+  const deleteContact = (id) => {
+    const personToDelete = persons.find((person) => person.id === id);
+    if (!personToDelete) return;
+
+    const isConfirmed = window.confirm(`Delete ${personToDelete.name} ?`);
+    if (isConfirmed) {
+      const updatedContacts = persons.filter((person) => person.id !== id);
+
+      setPersons(updatedContacts);
+    }
+  };
 
   return (
     <div>
@@ -79,7 +90,7 @@ const App = () => {
         onNumberChange={onNumberChange}
         addContact={addContact}
       />
-      <ListOfContacts searchResult={searchResult} />
+      <ListOfContacts searchResult={searchResult} onDelete={deleteContact} />
     </div>
   );
 };
