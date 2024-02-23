@@ -118,13 +118,14 @@ const App = () => {
 
     const isConfirmed = window.confirm(`Delete ${personToDelete.name} ?`);
     if (isConfirmed) {
-      const updatedContacts = persons.filter((person) => person.id !== id);
-
-      setPersons(updatedContacts);
-      setSuccessMessage(`${personToDelete.name} Deleted Successfully`);
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 1000);
+      personService.deletePerson(personToDelete.id).then((returndPerson) => {
+        const updatedPersons = persons.filter((person) => person.id !== id);
+        setPersons(updatedPersons);
+        setSuccessMessage(`${personToDelete.name} Deleted Successfully`);
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 1000);
+      });
     }
   };
 
