@@ -114,18 +114,34 @@ const App = () => {
   };
   const deleteContact = (id) => {
     const personToDelete = persons.find((person) => person.id === id);
-    if (!personToDelete) return;
+    if (!personToDelete) {
+      setErrorMessage("This contact has already been deleted.");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 1000);
+      return;
+    }
 
     const isConfirmed = window.confirm(`Delete ${personToDelete.name} ?`);
     if (isConfirmed) {
-      personService.deletePerson(personToDelete.id).then((returndPerson) => {
-        const updatedPersons = persons.filter((person) => person.id !== id);
-        setPersons(updatedPersons);
-        setSuccessMessage(`${personToDelete.name} Deleted Successfully`);
-        setTimeout(() => {
-          setSuccessMessage(null);
-        }, 1000);
-      });
+      personService
+        .deletePerson(personToDelete.id)
+        .then((returndPerson) => {
+          const updatedPersons = persons.filter((person) => person.id !== id);
+          setPersons(updatedPersons);
+          setSuccessMessage(`${personToDelete.name} Deleted Successfully`);
+          setTimeout(() => {
+            setSuccessMessage(null);
+          }, 1000);
+        })
+        .catch((error) => {
+          setErrorMessage(
+            `Information of ${personToDelete.name} has already been deleted from the server.`
+          );
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 2000);
+        });
     }
   };
 
