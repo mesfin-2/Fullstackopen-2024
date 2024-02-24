@@ -10,7 +10,8 @@ const App = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("");
   const [showAll, setShowAll] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("some error happened...");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     noteService.getAll().then((initialNotes) => {
@@ -33,6 +34,10 @@ const App = () => {
     noteService.create(noteObject).then((returnedNote) => {
       //setNotes(notes.concat(returnedNote));
       setNotes([...notes, returnedNote]);
+      setSuccessMessage("note created successfully");
+      setTimeout(() => {
+        setSuccessMessage(null);
+      }, 1000);
 
       setNewNote("");
       console.log(newNote);
@@ -44,6 +49,39 @@ const App = () => {
 
   const onToggleShow = () => {
     setShowAll(!showAll);
+  };
+
+  const deleteNote = (id) => {
+    const noteToDelete = notes.find((note) => note.id === id);
+    if (!noteToDelete) {
+      setErrorMessage("This note has already been deleted.");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 1000);
+      return;
+    }
+
+    const isConfirmed = window.confirm(`Delete note ?`);
+    if (isConfirmed) {
+      noteService
+        .deleteNote(noteToDelete.id)
+        .then((returndNote) => {
+          const updatedNotes = notes.filter((note) => note.id !== id);
+          setNotes(updatedNotes);
+          setSuccessMessage("Note Deleted Successfully");
+          setTimeout(() => {
+            setSuccessMessage(null);
+          }, 1000);
+        })
+        .catch((error) => {
+          setErrorMessage(
+            `Information of ${noteToDelete.content} has already been deleted from the server.`
+          );
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 2000);
+        });
+    }
   };
 
   const toggleImportanceOf = (id) => {
@@ -67,10 +105,10 @@ const App = () => {
         setErrorMessage(
           `the note '${note.content}' was already deleted from server`
         );
-
         setTimeout(() => {
           setErrorMessage(null);
-        }, 5000);
+        }, 1000);
+
         //deleted note gets filtered out from the state.
         setNotes(notes.filter((n) => n.id !== id));
       });
@@ -82,7 +120,9 @@ const App = () => {
   return (
     <div>
       <h1>Notes</h1>
-      <Notification message={errorMessage} />
+      {errorMessage && <Notification errormessage={errorMessage} />}
+      {successMessage && <Notification successmessage={successMessage} />}
+
       <button onClick={onToggleShow}>
         show {showAll ? "important" : "all"}
       </button>
@@ -93,6 +133,7 @@ const App = () => {
               key={note.id}
               note={note}
               toggleImportance={() => toggleImportanceOf(note.id)}
+              handleDeleteNote={() => deleteNote(note.id)}
             />
           ))}
       </ul>
