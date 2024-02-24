@@ -13,7 +13,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResult, setSearchResult] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("something goes wrong");
+  const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
@@ -37,15 +37,23 @@ const App = () => {
       id: uuidv4(),
     };
     //make post request to json-server
-    personService.create(nameObject).then((returnedPerson) => {
-      setPersons([...persons, returnedPerson]);
-      setNewName("");
-      setNewNumber("");
-      setSuccessMessage(`${returnedPerson.name} Added Successfully`);
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 1000);
-    });
+    personService
+      .create(nameObject)
+      .then((returnedPerson) => {
+        setPersons([...persons, returnedPerson]);
+        setSuccessMessage(`${returnedPerson.name} Added Successfully`);
+        setNewName("");
+        setNewNumber("");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 1000);
+      })
+      .catch((error) => {
+        setErrorMessage("account not added");
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1000);
+      });
 
     //check if the contact is already in there
     const existedContact = persons.find(
@@ -67,37 +75,20 @@ const App = () => {
               person.id === returnedPerson.id ? returnedPerson : person
             );
             setPersons(updatedPersons);
-            setNewName("");
-            setNewNumber("");
             setSuccessMessage(`${returnedPerson.name} Updated Successfully`);
-            setTimeout(() => {
-              setSuccessMessage(null);
-            }, 1000);
-          })
-          .catch((error) => {
-            setErrorMessage("Error updating contact:");
-          });
-      }
-    } else {
-      // Prompt the user to confirm adding the new contact
-      const isConfirmed = window.confirm(`Add ${newName} to the phonebook?`);
-
-      if (isConfirmed) {
-        // Add the new contact
-        personService
-          .create(nameObject)
-          .then((returnedPerson) => {
-            // Update the state with the new contact
-            setPersons([...persons, returnedPerson]);
             setNewName("");
             setNewNumber("");
-            setSuccessMessage(`${returnedPerson.name} Created Successfully`);
             setTimeout(() => {
               setSuccessMessage(null);
             }, 1000);
           })
           .catch((error) => {
-            setErrorMessage("Error updating contact:");
+            setErrorMessage(
+              `Information ${existedContact.name} already removed from server`
+            );
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 1000);
           });
       }
     }
@@ -119,7 +110,6 @@ const App = () => {
       setTimeout(() => {
         setErrorMessage(null);
       }, 1000);
-      return;
     }
 
     const isConfirmed = window.confirm(`Delete ${personToDelete.name} ?`);
@@ -140,7 +130,7 @@ const App = () => {
           );
           setTimeout(() => {
             setErrorMessage(null);
-          }, 2000);
+          }, 1000);
         });
     }
   };
@@ -148,7 +138,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successMessage} />
+      <Notification
+        successMessage={successMessage}
+        errorMessage={errorMessage}
+      />
       <Search searchTerm={searchTerm} onSearch={onsearchTermChange} />
       <AddNewContact
         newName={newName}
