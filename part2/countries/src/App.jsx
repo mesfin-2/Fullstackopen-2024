@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import ListCountries from "./components/ListCountries";
+import Country from "./components/Country";
+import Search from "./components/Search";
+import countryServices from "./services/countries.js";
 
 function App() {
   const [countries, setCountries] = useState([]);
@@ -11,31 +15,35 @@ function App() {
   const [flags, setFlags] = useState([]);
   const [weatherData, setWeatherData] = useState({});
   const [city, setCity] = useState("");
+  const { errorMessage, setErrorMessage } = useState(null);
 
   useEffect(() => {
-    axios
-      .get("https://studies.cs.helsinki.fi/restcountries/api/all")
+    countryServices
+      .getCountries()
       .then((response) => {
-        setCountries(response.data);
+        setCountries(response);
       })
       .catch((error) => {
-        console.log("countries does'n fetched");
+        setErrorMessage("Something went wrong");
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1000);
       });
   }, []);
   const api_key = import.meta.env.VITE_WEATHER_API_KEY;
   useEffect(() => {
     if (city) {
-      axios
-        .get(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${api_key}`
-        )
-
+      countryServices
+        .getWeather(city)
         .then((response) => {
-          setWeatherData(response.data);
-          console.log("weather", response.data);
+          setWeatherData(response);
+          console.log("weather", response);
         })
         .catch((error) => {
-          console.log("something went wrong");
+          setErrorMessage("Something went wrong");
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 1000);
         });
     }
   }, [city]);
@@ -70,47 +78,15 @@ function App() {
   return (
     <div>
       <h2>Countries</h2>
-      <label htmlFor="search">Find countries:</label>
-      <input
-        id="search"
-        type="text"
-        value={searchTerm}
-        onChange={handleSearch}
-        placeholder="Search countries..."
+      {errorMessage && <Notification errorMessage={errorMessage} />}
+      <Search searchTerm={searchTerm} handleSearch={handleSearch} />
+      <ListCountries searchResults={searchResults} searchCount={searchCount} />
+      <Country
+        selectedCountry={selectedCountry}
+        weatherData={weatherData}
+        languages={languages}
+        flags={flags}
       />
-      <ul>
-        {searchResults.map((country) => (
-          <li key={country.name.common}>{country.name.common}</li>
-        ))}
-      </ul>
-      {searchCount >= 10 && <p>Too many matches, specify another filter</p>}
-      {selectedCountry && (
-        <div>
-          <h1>{selectedCountry.name.common}</h1>
-          <h4>Capital: {selectedCountry.capital}</h4>
-          <h4>Area: {selectedCountry.area} sq km</h4>
-          <h3>Languages:</h3>
-          {languages.map((lang, index) => (
-            <li key={index}>{lang}</li>
-          ))}
-          {flags.length > 0 && <img src={flags[0]} alt="Country Flag" />}
-          <h3>Weather in {selectedCountry.capital}</h3>
-          {weatherData && weatherData.main && (
-            <div>
-              <h4>Temperature: {weatherData.main.feels_like} Celcius</h4>
-              {weatherData.weather && weatherData.weather.length > 0 && (
-                <div>
-                  <h4>Description: {weatherData.weather[0].description}</h4>
-                  <img
-                    src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}.png`}
-                  />
-                  <h4>wind: {weatherData.wind.speed} m/s</h4>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
