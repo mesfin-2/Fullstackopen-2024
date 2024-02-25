@@ -22,11 +22,12 @@ function App() {
         console.log("countries does'n fetched");
       });
   }, []);
+  const api_key = import.meta.env.VITE_WEATHER_API_KEY;
   useEffect(() => {
     if (city) {
       axios
         .get(
-          `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=284d3c720a9cf4c77d3f1f137564c6c9`
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${api_key}`
         )
 
         .then((response) => {
