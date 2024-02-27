@@ -40,6 +40,15 @@ app.get("/info", (req, res) => {
     )
     .end();
 });
+app.get("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const person = persons.find((p) => p.id === id);
+  if (person) {
+    res.status(200).send(person);
+  }
+
+  res.status(404).end();
+});
 
 const PORT = 3001;
 app.listen(PORT, (req, res) => {
