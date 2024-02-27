@@ -1,9 +1,6 @@
 const http = require("http");
 const express = require("express");
 
-const app = express();
-app.use(express.json());
-
 let notes = [
   {
     id: 1,
@@ -21,6 +18,21 @@ let notes = [
     important: true,
   },
 ];
+const requestLogger = (request, response, next) => {
+  console.log("Method:", request.method);
+  console.log("Path:  ", request.path);
+  console.log("Body:  ", request.body);
+  console.log("---");
+  next();
+};
+
+const app = express();
+app.use(express.json());
+
+//This middleware will be used for catching requests made to non-existent routes.
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
 
 app.get("/", (req, res) => {
   res.send("<h2>Hello World</h2>");
