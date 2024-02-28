@@ -1,5 +1,6 @@
 const http = require("http");
 const express = require("express");
+const cors = require("cors");
 
 let notes = [
   {
@@ -28,6 +29,7 @@ const requestLogger = (request, response, next) => {
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 //This middleware will be used for catching requests made to non-existent routes.
 const unknownEndpoint = (request, response) => {
@@ -86,6 +88,6 @@ app.post("/api/notes", (request, response) => {
 //   response.end(JSON.stringify(notes));
 // });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);
