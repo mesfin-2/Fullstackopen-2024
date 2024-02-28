@@ -30,6 +30,8 @@ const requestLogger = (request, response, next) => {
 const app = express();
 app.use(express.json());
 app.use(cors());
+//To make express show static content, the page index.html and the JavaScript, etc., it fetches,
+app.use(express.static("dist"));
 
 //This middleware will be used for catching requests made to non-existent routes.
 const unknownEndpoint = (request, response) => {
