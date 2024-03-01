@@ -6,9 +6,9 @@ const Person = require("./models/person.js");
 const person = require("./models/person.js");
 
 const app = express();
+app.use(express.static("dist"));
 app.use(express.json());
 app.use(cors());
-app.use(express.static("dist"));
 
 morgan.token("body", (req, res) => JSON.stringify(req.body));
 app.use(
@@ -105,6 +105,17 @@ app.post("/api/persons", (req, res) => {
       res.status(500).json({ error: "Server error" });
     });
 });
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, (req, res) => {
