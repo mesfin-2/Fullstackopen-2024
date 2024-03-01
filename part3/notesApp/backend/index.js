@@ -14,10 +14,10 @@ const requestLogger = (request, response, next) => {
 };
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 //To make express show static content, the page index.html and the JavaScript, etc., it fetches,
 app.use(express.static("dist"));
+app.use(express.json());
+app.use(cors());
 
 //This middleware will be used for catching requests made to non-existent routes.
 const unknownEndpoint = (request, response) => {
@@ -32,22 +32,42 @@ app.get("/api/notes", (req, res) => {
     res.json(notes);
   });
 });
-app.get("/api/notes/:id", (req, res) => {
+app.get("/api/notes/:id", (req, res, next) => {
   const { id } = req.params;
-  Note.findById(id).then((note) => {
-    res.json(note);
-  });
-  // if (note) {
-  //   res.status(200).json(note);
-  // } else {
-  //   res.status(404).end();
-  // }
+  const note = Note.findById(id)
+    .then((note) => {
+      //res.json(note);
+      if (note) {
+        res.json(note);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
-app.delete("/api/notes/:id", (req, res) => {
-  const id = Number(req.params.id);
-  notes = notes.filter((note) => note.id !== id);
+app.delete("/api/notes/:id", (req, res, next) => {
+  const { id } = req.params;
+  Note.findByIdAndDelete(id)
+    .then((result) => {
+      res.status(204).end();
+    })
+    .catch((error) => next(error));
+});
 
-  res.status(204).end();
+app.put("/api/notes/:id", (req, res, next) => {
+  const { id } = req.params;
+  const { content, important } = req.body;
+
+  const note = {
+    content: content,
+    important: important,
+  };
+
+  Note.findByIdAndUpdate(id, note, { new: true })
+    .then((updatedNote) => {
+      res.json(updatedNote);
+    })
+    .catch((error) => next(error));
 });
 
 const generateId = () => {
@@ -74,6 +94,20 @@ app.post("/api/notes", (request, response) => {
   });
 });
 app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+app.use(errorHandler);
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT);
