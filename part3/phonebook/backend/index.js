@@ -66,11 +66,13 @@ app.get("/api/persons/:id", (req, res) => {
 
   res.status(404).end();
 });
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  persons = persons.filter((p) => p.id !== id);
-
-  res.status(204).end(); //no more operation
+app.delete("/api/persons/:id", (req, res, error) => {
+  const { id } = req.params;
+  Person.findByIdAndDelete(id)
+    .then((result) => {
+      res.status(204).end(); //no more operation
+    })
+    .catch((error) => next(error));
 });
 
 app.post("/api/persons", (req, res) => {
