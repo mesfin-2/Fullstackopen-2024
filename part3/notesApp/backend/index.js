@@ -1,24 +1,10 @@
+require("dotenv").config();
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
+const Note = require("./models/note.js");
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    important: true,
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    important: false,
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true,
-  },
-];
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
   console.log("Path:  ", request.path);
@@ -42,16 +28,20 @@ app.get("/", (req, res) => {
   res.send("<h2>Hello World</h2>");
 });
 app.get("/api/notes", (req, res) => {
-  res.json(notes);
+  Note.find({}).then((notes) => {
+    res.json(notes);
+  });
 });
 app.get("/api/notes/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const note = notes.find((note) => note.id === id);
-  if (note) {
-    res.status(200).json(note);
-  } else {
-    res.status(404).end();
-  }
+  const { id } = req.params;
+  Note.findById(id).then((note) => {
+    res.json(note);
+  });
+  // if (note) {
+  //   res.status(200).json(note);
+  // } else {
+  //   res.status(404).end();
+  // }
 });
 app.delete("/api/notes/:id", (req, res) => {
   const id = Number(req.params.id);
@@ -68,28 +58,23 @@ const generateId = () => {
 app.post("/api/notes", (request, response) => {
   const body = request.body;
 
-  if (!body.content) {
+  if (!body.content || undefined) {
     return response.status(400).json({
       error: "content missing",
     });
   }
 
-  const note = {
+  const note = new Note({
     content: body.content,
     important: Boolean(body.important) || false,
-    id: generateId(),
-  };
+  });
 
-  notes = notes.concat(note);
-
-  response.json(note);
+  note.save().then((savedNote) => {
+    response.json(savedNote);
+  });
 });
+app.use(unknownEndpoint);
 
-// const app = http.createServer((request, response) => {
-//   response.writeHead(200, { "Content-Type": "application/json" });
-//   response.end(JSON.stringify(notes));
-// });
-
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);
