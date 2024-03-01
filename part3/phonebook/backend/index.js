@@ -1,6 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const Person = require("./models/person.js");
+const person = require("./models/person.js");
 
 const app = express();
 app.use(express.json());
@@ -41,7 +44,9 @@ app.get("/", (req, res) => {
   res.send("Its working");
 });
 app.get("/api/persons", (req, res) => {
-  res.status(200).json(persons);
+  Person.find({}).then((persons) => {
+    res.status(200).json(persons);
+  });
 });
 app.get("/info", (req, res) => {
   res
@@ -69,29 +74,37 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 app.post("/api/persons", (req, res) => {
-  const name = req.body.name;
-  const number = req.body.number;
+  const { name, number } = req.body;
+
   if (!name || !number) {
     return res.status(400).json({ error: "Name or number is missing" });
   }
 
-  //const id = req.params.id;
-  const newPerson = {
-    name,
-    number,
-    id: Math.floor(Math.random() * 10000), // Math.floor for integer id
-  };
-  //existing name
-  const existingName = persons.find((person) => person.name === newPerson.name);
-  if (!existingName) {
-    persons = persons.concat(newPerson);
-    res.status(201).json(persons);
-  } else {
-    res.status(404).json({ error: "name must be unique" });
-  }
+  // Check if the person already exists by name
+  Person.findOne({ name: name })
+    .then((existingPerson) => {
+      if (existingPerson) {
+        return res.status(400).json({ error: "Name must be unique" });
+      }
+
+      // If the person doesn't exist, create and save a new person
+      const newPerson = new Person({
+        name: name,
+        number: number,
+      });
+
+      return newPerson.save();
+    })
+    .then((savedPerson) => {
+      res.status(201).json(savedPerson);
+    })
+    .catch((error) => {
+      console.error("Error:", error.message);
+      res.status(500).json({ error: "Server error" });
+    });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, (req, res) => {
   console.log(`server Running at port ${PORT}`);
   //res.status(200).json(`<h2>Serving running ${PORT}</h2>`);
