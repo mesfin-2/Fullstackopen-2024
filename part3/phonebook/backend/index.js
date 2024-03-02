@@ -48,22 +48,23 @@ app.get("/api/persons", (req, res) => {
   });
 });
 app.get("/info", (req, res) => {
-  res
-    .send(
-      `<p>Phonebook has info for ${
-        persons.length
-      } people </p>${new Date()}<p></p>`
-    )
-    .end();
+  const persons = Person.find({}).then((persons) => {
+    res
+      .send(
+        `<p>Phonebook has info for ${persons.length}
+         people(s) </p>${new Date()}<p></p>`
+      )
+      .end();
+  });
 });
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((p) => p.id === id);
-  if (person) {
-    res.status(200).send(person);
-  }
-
-  res.status(404).end();
+  const { id } = req.params;
+  Person.findById(id)
+    .then((result) => {
+      res.json(result);
+    })
+    // Pass error to errorHandler middleware
+    .catch((error) => next(error));
 });
 app.delete("/api/persons/:id", (req, res, error) => {
   const { id } = req.params;
