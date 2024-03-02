@@ -3,7 +3,6 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const Person = require("./models/person.js");
-const person = require("./models/person.js");
 
 const app = express();
 app.use(express.static("dist"));
@@ -72,6 +71,7 @@ app.delete("/api/persons/:id", (req, res, error) => {
     .then((result) => {
       res.status(204).end(); //no more operation
     })
+    // Pass error to errorHandler middleware
     .catch((error) => next(error));
 });
 
@@ -106,6 +106,25 @@ app.post("/api/persons", (req, res) => {
     });
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const { id } = req.params;
+  const { number } = req.body;
+
+  // Find the existing person by ID
+  Person.findByIdAndUpdate(id, { number }, { new: true })
+    .then((updatedPerson) => {
+      if (updatedPerson) {
+        // If person with ID exists, update and send updated person as response
+
+        res.json(updatedPerson);
+      } else {
+        // If person with ID doesn't exist, return 404 Not Found
+        res.status(404).json({ error: "Person not found" });
+      }
+    })
+    .catch((error) => next(error));
+});
+
 const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
@@ -115,6 +134,10 @@ const errorHandler = (error, request, response, next) => {
 
   next(error);
 };
+/* The errorHandler
+It's typically defined after all the other route and middleware 
+definitions the your application, so it catches any errors that occur during the processing of a request.
+*/
 app.use(errorHandler);
 
 const PORT = process.env.PORT;
