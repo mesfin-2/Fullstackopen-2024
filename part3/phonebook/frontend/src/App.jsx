@@ -3,7 +3,6 @@ import Search from "./components/Search";
 import AddNewContact from "./components/AddNewContact";
 import ListOfContacts from "./components/ListOfContacts";
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
 import personService from "./services/person.js";
 import Notification from "./components/Notification.jsx";
 
@@ -34,9 +33,45 @@ const App = () => {
     const nameObject = {
       name: newName,
       number: newNumber,
-      id: uuidv4(),
     };
-    //make post request to json-server
+
+    const existingContact = persons.find(
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
+    );
+    //If the contact name is already existed
+    if (existingContact) {
+      const isConfirmed = window.confirm(
+        `${newName} is already added to the phonebook, replace the old number with the new one?`
+      );
+      if (isConfirmed) {
+        personService
+          .update(existingContact.id, nameObject)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id === existingContact.id ? returnedPerson : person
+              )
+            );
+            setSuccessMessage(`${returnedPerson.name} Updated Successfully`);
+            setNewName("");
+            setNewNumber("");
+            setTimeout(() => {
+              setSuccessMessage(null);
+            }, 1000);
+          })
+          .catch((error) => {
+            setErrorMessage(
+              `Error updating ${existingContact.name}: ${error.response.data.error}`
+            );
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 3000);
+          });
+        return;
+      }
+    }
+
+    // If contact doesn't exist, create a new one
     personService
       .create(nameObject)
       .then((returnedPerson) => {
@@ -49,50 +84,13 @@ const App = () => {
         }, 1000);
       })
       .catch((error) => {
-        setErrorMessage("account not added");
+        setErrorMessage("Error adding contact: " + error.response.data.error);
         setTimeout(() => {
           setErrorMessage(null);
-        }, 1000);
+        }, 3000);
       });
-
-    //check if the contact is already in there
-    const existedContact = persons.find(
-      (person) => person.name?.toLowerCase() === newName.toLowerCase()
-    );
-    if (existedContact) {
-      const isConfirmed = window.confirm(
-        `${newName} is already added to phonebook, replace the old number with the new one?`
-      );
-      if (isConfirmed) {
-        // Update the number of the existing contact
-
-        const updateConact = { ...existedContact, number: newNumber };
-        personService
-          .update(existedContact.id, updateConact)
-          .then((returnedPerson) => {
-            // Update the state with the updated contact
-            const updatedPersons = persons.map((person) =>
-              person.id === returnedPerson.id ? returnedPerson : person
-            );
-            setPersons(updatedPersons);
-            setSuccessMessage(`${returnedPerson.name} Updated Successfully`);
-            setNewName("");
-            setNewNumber("");
-            setTimeout(() => {
-              setSuccessMessage(null);
-            }, 1000);
-          })
-          .catch((error) => {
-            setErrorMessage(
-              `Information ${existedContact.name} already removed from server`
-            );
-            setTimeout(() => {
-              setErrorMessage(null);
-            }, 1000);
-          });
-      }
-    }
   };
+
   const onNameChange = (e) => {
     setNewName(e.target.value);
   };
@@ -116,7 +114,7 @@ const App = () => {
     if (isConfirmed) {
       personService
         .deletePerson(personToDelete.id)
-        .then((returndPerson) => {
+        .then(() => {
           const updatedPersons = persons.filter((person) => person.id !== id);
           setPersons(updatedPersons);
           setSuccessMessage(`${personToDelete.name} Deleted Successfully`);
