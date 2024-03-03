@@ -9,35 +9,12 @@ app.use(express.static("dist"));
 app.use(express.json());
 app.use(cors());
 
-morgan.token("body", (req, res) => JSON.stringify(req.body));
+morgan.token("body", (req) => JSON.stringify(req.body));
 app.use(
   morgan(
     ":method :url :status :response-time ms - :res[content-length] :body - :req[content-length]"
   )
 );
-
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
 
 app.get("/", (req, res) => {
   res.send("Its working");
@@ -48,7 +25,7 @@ app.get("/api/persons", (req, res) => {
   });
 });
 app.get("/info", (req, res) => {
-  const persons = Person.find({}).then((persons) => {
+  Person.find({}).then((persons) => {
     res
       .send(
         `<p>Phonebook has info for ${persons.length}
@@ -57,7 +34,7 @@ app.get("/info", (req, res) => {
       .end();
   });
 });
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   const { id } = req.params;
   Person.findById(id)
     .then((result) => {
@@ -66,10 +43,10 @@ app.get("/api/persons/:id", (req, res) => {
     // Pass error to errorHandler middleware
     .catch((error) => next(error));
 });
-app.delete("/api/persons/:id", (req, res, error) => {
+app.delete("/api/persons/:id", (req, res, next) => {
   const { id } = req.params;
   Person.findByIdAndDelete(id)
-    .then((result) => {
+    .then(() => {
       res.status(204).end(); //no more operation
     })
     // Pass error to errorHandler middleware
@@ -143,7 +120,7 @@ const errorHandler = (error, request, response, next) => {
 app.use(errorHandler);
 
 const PORT = process.env.PORT;
-app.listen(PORT, (req, res) => {
+app.listen(PORT, () => {
   console.log(`server Running at port ${PORT}`);
   //res.status(200).json(`<h2>Serving running ${PORT}</h2>`);
 });
