@@ -130,6 +130,11 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: "malformatted id" });
     //When validating an object fails, we return the following default error message from Mongoose:
   } else if (error.name === "ValidationError") {
+    /*
+    const errors = Object.values(error.errors).map((err) => err.message);
+    return response.status(400).json({ error: errors });
+
+    */
     return response.status(400).json({ error: error.message });
   }
 

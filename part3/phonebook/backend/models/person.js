@@ -19,7 +19,16 @@ const personSchema = new mongoose.Schema({
     minLength: 3,
     required: true,
   },
-  number: String,
+  number: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return /^\d{2,3}-\d{6,}/.test(v);
+      },
+      message: " Invalid phone number format",
+    },
+    required: [true, " Phone number required"],
+  },
 });
 
 //Transform The mongoose _id object to id
