@@ -1,8 +1,8 @@
 import axios from "axios";
 
 //const baseURL = "api/persons";
-const baseURL = "http://localhost:3001/api/persons";
-//const baseURL = "https://fullstackopen-2024-phonebook.onrender.com/api/persons";
+//const baseURL = "http://localhost:3001/api/persons";
+const baseURL = "https://fullstackopen-2024-phonebook.onrender.com/api/persons";
 
 const getAll = () => {
   const request = axios.get(baseURL);
