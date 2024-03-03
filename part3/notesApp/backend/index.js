@@ -1,17 +1,15 @@
 require("dotenv").config();
-const http = require("http");
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
 const Note = require("./models/note.js");
 
-const requestLogger = (request, response, next) => {
-  console.log("Method:", request.method);
-  console.log("Path:  ", request.path);
-  console.log("Body:  ", request.body);
-  console.log("---");
-  next();
-};
+// const requestLogger = (request, response, next) => {
+//   console.log("Method:", request.method);
+//   console.log("Path:  ", request.path);
+//   console.log("Body:  ", request.body);
+//   console.log("---");
+//   next();
+// };
 
 const app = express();
 //To make express show static content, the page index.html and the JavaScript, etc., it fetches,
@@ -34,7 +32,7 @@ app.get("/api/notes", (req, res) => {
 });
 app.get("/api/notes/:id", (req, res, next) => {
   const { id } = req.params;
-  const note = Note.findById(id)
+  Note.findById(id)
     .then((note) => {
       //res.json(note);
       if (note) {
@@ -48,7 +46,7 @@ app.get("/api/notes/:id", (req, res, next) => {
 app.delete("/api/notes/:id", (req, res, next) => {
   const { id } = req.params;
   Note.findByIdAndDelete(id)
-    .then((result) => {
+    .then(() => {
       res.status(204).end();
     })
     .catch((error) => next(error));
@@ -74,10 +72,10 @@ app.put("/api/notes/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
+// const generateId = () => {
+//   const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
+//   return maxId + 1;
+// };
 
 app.post("/api/notes", (request, response, next) => {
   const body = request.body;

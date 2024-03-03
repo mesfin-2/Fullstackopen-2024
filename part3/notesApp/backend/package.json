@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
     "dev": "nodemon index.js",
     "start": "node index.js",
     "build:ui": "rm -rf dist && cd ../frontend && pnpm run build && cp -r dist ../backend",
@@ -20,6 +21,9 @@
     "mongoose": "^8.2.0"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin-js": "^1.6.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.33.2",
     "nodemon": "^3.1.0"
   }
 }
