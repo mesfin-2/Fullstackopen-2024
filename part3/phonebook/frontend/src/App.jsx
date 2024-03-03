@@ -84,7 +84,8 @@ const App = () => {
         }, 1000);
       })
       .catch((error) => {
-        setErrorMessage("Error adding contact: " + error.response.data.error);
+        setErrorMessage(error.response.data.error);
+
         setTimeout(() => {
           setErrorMessage(null);
         }, 3000);
