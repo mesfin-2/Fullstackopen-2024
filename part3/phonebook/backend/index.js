@@ -76,7 +76,7 @@ app.delete("/api/persons/:id", (req, res, error) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const { name, number } = req.body;
 
   if (!name || !number) {
@@ -101,10 +101,7 @@ app.post("/api/persons", (req, res) => {
     .then((savedPerson) => {
       res.status(201).json(savedPerson);
     })
-    .catch((error) => {
-      console.error("Error:", error.message);
-      res.status(500).json({ error: "Server error" });
-    });
+    .catch((error) => next(error));
 });
 
 app.put("/api/persons/:id", (req, res, next) => {
@@ -131,14 +128,13 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+    //When validating an object fails, we return the following default error message from Mongoose:
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
 };
-/* The errorHandler
-It's typically defined after all the other route and middleware 
-definitions the your application, so it catches any errors that occur during the processing of a request.
-*/
 app.use(errorHandler);
 
 const PORT = process.env.PORT;
