@@ -1,10 +1,20 @@
 const mongoose = require("mongoose");
 
 const blogSchema = new mongoose.Schema({
-  title: String,
-  author: String,
+  title: {
+    type: String,
+    required: true,
+    minlength: 3,
+  },
+  author: {
+    type: String,
+    required: true,
+    minlength: 2,
+  },
   url: String,
-  likes: Number,
+  likes: {
+    type: Number,
+  },
 });
 
 const Blog = mongoose.model("Blog", blogSchema);
