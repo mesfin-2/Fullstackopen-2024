@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "dev": "nodemon index.js",
     "start": "node index.js",
     "build:ui": "rm -rf dist && cd ../frontend && pnpm run build && cp -r dist ../backend",
-    "deploy:full": "pnpm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "pnpm run build:ui && git add . && git commit -m uibuild && git push",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",
