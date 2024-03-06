@@ -55,3 +55,38 @@ describe("total likes", () => {
     assert.strictEqual(result, 7);
   });
 });
+
+describe("favorite Blog", () => {
+  test("of which blog has the most likes", () => {
+    const blogs = [
+      {
+        _id: "65e6bced8c52c72162f32fbb",
+        title: "MERN app guideline",
+        author: "Mesfin T",
+        url: "https://blog.nextideatech.com/how-to-get-started-with-the-mern-stack-a-comprehensive-guide/",
+        likes: 2,
+        __v: 0,
+      },
+      {
+        _id: "65e6bced8c52c72162f32fba",
+        title: "React Best Practices",
+        author: "John Doe",
+        url: "https://react-best-practices.com",
+        likes: 5,
+        __v: 0,
+      },
+    ];
+    const expected = {
+      title: "React Best Practices",
+      author: "John Doe",
+      likes: 5,
+    };
+
+    const result = list.favoriteBlog(blogs);
+    assert.deepStrictEqual(result, expected);
+  });
+  test("of empty list is null", () => {
+    const result = list.favoriteBlog([]);
+    assert.strictEqual(result, null);
+  });
+});
