@@ -27,9 +27,27 @@ const favoriteBlog = (blogs) => {
     likes: maxLikesBlog.likes,
   };
 };
+const mostBlogsAuthor = (blogs) => {
+  // Check if the array is empty
+  if (blogs.length === 0) {
+    return null; // Return null if the array is empty
+  }
+
+  // Find the blog with the maximum number of likes
+  const mostBlogsAuthor = blogs.reduce((prev, current) =>
+    prev.author > current.author ? prev : current
+  );
+  //console.log("mostBlogsAuthor", mostBlogsAuthor);
+
+  return {
+    author: mostBlogsAuthor.author,
+    blogs: mostBlogsAuthor.length,
+  };
+};
 
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
+  mostBlogsAuthor,
 };

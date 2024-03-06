@@ -85,8 +85,47 @@ describe("favorite Blog", () => {
     const result = list.favoriteBlog(blogs);
     assert.deepStrictEqual(result, expected);
   });
+
   test("of empty list is null", () => {
     const result = list.favoriteBlog([]);
     assert.strictEqual(result, null);
+  });
+});
+
+describe("most Blogs Author", () => {
+  test("of which author has the most blogs", () => {
+    const blogs = [
+      {
+        _id: "65e6bced8c52c72162f32fbb",
+        title: "MERN app guideline",
+        author: "Mesfin T",
+        url: "https://blog.nextideatech.com/how-to-get-started-with-the-mern-stack-a-comprehensive-guide/",
+        likes: 2,
+        __v: 0,
+      },
+      {
+        _id: "65e6bced8c52c72162f32fba",
+        title: "React Best Practices",
+        author: "John Doe",
+        url: "https://react-best-practices.com",
+        likes: 5,
+        __v: 0,
+      },
+      {
+        _id: "65e6bced8c52c72162f32fba",
+        title: "React Best Practices",
+        author: "John Doe",
+        url: "https://react-best-practices.com",
+        likes: 4,
+        __v: 0,
+      },
+    ];
+    const expected = {
+      author: "John Doe",
+      blogs: 2,
+    };
+
+    const result = list.mostBlogsAuthor(blogs);
+    assert.deepStrictEqual(result, expected);
   });
 });
