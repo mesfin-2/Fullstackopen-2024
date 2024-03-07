@@ -29,7 +29,7 @@ Note.find({}).then((result) => {
 });
 
 const note = new Note({
-  content: "HTML is easy",
+  content: "CSS is easy",
   important: true,
 });
 
