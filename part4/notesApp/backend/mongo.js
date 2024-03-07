@@ -28,12 +28,12 @@ Note.find({}).then((result) => {
   mongoose.connection.close();
 });
 
-// const note = new Note({
-//   content: "Mongoose makes things easy",
-//   important: true,
-// });
+const note = new Note({
+  content: "HTML is easy",
+  important: true,
+});
 
-// note.save().then((result) => {
-//   console.log("note saved!");
-//   mongoose.connection.close();
-// });
+note.save().then((result) => {
+  console.log("note saved!");
+  mongoose.connection.close();
+});

@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "dev": "nodemon index.js",
-    "start": "node index.js",
+    "start": "NODE_ENV=production node index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
+    "test": "NODE_ENV=test node --test",
     "build:ui": "rm -rf dist && cd ../frontend && pnpm run build && cp -r dist ../backend",
-    "deploy:full": "pnpm run build:ui && git add . && git commit -m uibuild && git push",
-    "test": "node --test"
+    "deploy:full": "pnpm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "@stylistic/eslint-plugin-js": "^1.6.3",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.33.2",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "supertest": "^6.3.4"
   }
 }
