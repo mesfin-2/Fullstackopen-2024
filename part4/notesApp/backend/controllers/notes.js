@@ -1,15 +1,14 @@
 const notesRouter = require("express").Router();
 const Note = require("../models/note");
 
-notesRouter.get("/", (req, res) => {
-  Note.find({}).then((notes) => {
-    res.json(notes);
-  });
+notesRouter.get("/", async (req, res) => {
+  const notes = await Note.find({});
+  res.json(notes);
 });
 
-notesRouter.get("/:id", (req, res, next) => {
+notesRouter.get("/:id", async (req, res, next) => {
   const { id } = req.params;
-  Note.findById(id)
+  const note = await Note.findById(id)
     .then((note) => {
       //res.json(note);
       if (note) {
@@ -30,7 +29,7 @@ notesRouter.delete("/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-notesRouter.put("/:id", (req, res, next) => {
+notesRouter.put("/:id", async (req, res, next) => {
   const { id } = req.params;
   const { content, important } = req.body;
 
@@ -39,7 +38,7 @@ notesRouter.put("/:id", (req, res, next) => {
     important: important,
   };
 
-  Note.findByIdAndUpdate(id, note, {
+  const updatedNote = await Note.findByIdAndUpdate(id, note, {
     new: true,
     runValidators: true,
     context: "query",
@@ -50,7 +49,7 @@ notesRouter.put("/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-notesRouter.post("/", (request, response, next) => {
+notesRouter.post("/", async (request, response, next) => {
   const body = request.body;
 
   if (!body.content || undefined) {
@@ -59,7 +58,7 @@ notesRouter.post("/", (request, response, next) => {
     });
   }
 
-  const note = new Note({
+  const note = await new Note({
     content: body.content,
     important: Boolean(body.important) || false,
   });
