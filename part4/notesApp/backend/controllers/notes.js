@@ -58,17 +58,14 @@ notesRouter.post("/", async (request, response, next) => {
     });
   }
 
-  const note = await new Note({
+  const note = new Note({
     content: body.content,
     important: Boolean(body.important) || false,
   });
 
-  note
-    .save()
-    .then((savedNote) => {
-      response.json(savedNote);
-    })
-    .catch((error) => next(error));
+  const savedNote = await note.save();
+
+  response.status(201).json(savedNote);
 });
 
 module.exports = notesRouter;
