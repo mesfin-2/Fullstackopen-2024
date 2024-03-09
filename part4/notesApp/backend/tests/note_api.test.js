@@ -99,6 +99,33 @@ test("the first note is about HTTP methods", async () => {
   //assert => verify that the note is among the returned ones:
   assert(contents.includes(helper.initialNotes[0].content));
 });
+// Additional test to view a specific note
+test("a specific note can be viewed", async () => {
+  const noteAtStart = await helper.notesInDb();
+  const noteToView = noteAtStart[0];
+
+  const resultNote = await api
+    .get(`/api/notes/${noteToView.id}`)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  assert.deepStrictEqual(resultNote.body, noteToView);
+});
+
+// Additional test to delete a specific note
+test("a note can be deleted", async () => {
+  const notesAtStart = await helper.notesInDb();
+  const noteToDelete = notesAtStart[0];
+
+  await api.delete(`/api/notes/${noteToDelete.id}`).expect(204);
+
+  const notesAtEnd = await helper.notesInDb();
+
+  const contents = notesAtEnd.map((r) => r.content);
+  assert(!contents.includes(noteToDelete.content));
+
+  assert.strictEqual(notesAtEnd.length, helper.initialNotes.length - 1);
+});
 
 /*
 Once all the tests  have finished running we have to close the database connection
