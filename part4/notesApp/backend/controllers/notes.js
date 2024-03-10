@@ -5,37 +5,31 @@ notesRouter.get("/", async (req, res) => {
   const notes = await Note.find({});
   res.json(notes);
 });
-/*
-Because of the library(express-async-errors), we do not need the next(exception) call anymore.
- The library handles everything under the hood. 
-If an exception occurs in an async route, the execution is automatically
- passed to the error-handling middleware.
-
-*/
 
 notesRouter.get("/:id", async (req, res, next) => {
-  const { id } = req.params;
-  const note = await Note.findById(id);
+  try {
+    const { id } = req.params;
+    const note = await Note.findById(id);
 
-  //res.json(note);
-  if (note) {
-    res.json(note);
-  } else {
-    res.status(404).end();
+    //res.json(note);
+    if (note) {
+      res.json(note);
+    } else {
+      res.status(404).end();
+    }
+  } catch (exception) {
+    next(exception);
   }
 });
-/*
-Because of the library(express-async-errors), we do not need the next(exception) call anymore.
- The library handles everything under the hood. 
-If an exception occurs in an async route, the execution is automatically
- passed to the error-handling middleware.
 
-*/
-
-notesRouter.delete("/:id", async (req, res) => {
-  const { id } = req.params;
-  await Note.findByIdAndDelete(id);
-  res.status(204).end();
+notesRouter.delete("/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await Note.findByIdAndDelete(id);
+    res.status(204).end();
+  } catch (exception) {
+    next(error);
+  }
 });
 
 notesRouter.put("/:id", async (req, res, next) => {
@@ -58,13 +52,6 @@ notesRouter.put("/:id", async (req, res, next) => {
     .catch((error) => next(error));
 });
 
-/*
-Because of the library(express-async-errors), we do not need the next(exception) call anymore.
- The library handles everything under the hood. 
-If an exception occurs in an async route, the execution is automatically
- passed to the error-handling middleware.
-
-*/
 notesRouter.post("/", async (request, response, next) => {
   const body = request.body;
 
@@ -79,8 +66,12 @@ notesRouter.post("/", async (request, response, next) => {
     important: Boolean(body.important) || false,
   });
 
-  const savedNote = await note.save();
-  response.status(201).json(savedNote);
+  try {
+    const savedNote = await note.save();
+    response.status(201).json(savedNote);
+  } catch (exception) {
+    next(exception);
+  }
 });
 
 module.exports = notesRouter;
