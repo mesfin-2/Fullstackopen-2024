@@ -22,10 +22,10 @@ notesRouter.get("/:id", async (req, res, next) => {
   }
 });
 
-notesRouter.delete("/:id", (req, res, next) => {
+notesRouter.delete("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    Note.findByIdAndDelete(id);
+    await Note.findByIdAndDelete(id);
     res.status(204).end();
   } catch (exception) {
     next(error);
