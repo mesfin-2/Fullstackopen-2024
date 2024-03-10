@@ -7,29 +7,27 @@ notesRouter.get("/", async (req, res) => {
 });
 
 notesRouter.get("/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const note = await Note.findById(id);
+  const { id } = req.params;
+  const note = await Note.findById(id);
 
-    //res.json(note);
-    if (note) {
-      res.json(note);
-    } else {
-      res.status(404).end();
-    }
-  } catch (exception) {
-    next(exception);
+  //res.json(note);
+  if (note) {
+    res.json(note);
+  } else {
+    res.status(404).end();
   }
 });
 
+/*
+ we do not need the next(exception) call anymore.
+  The library handles everything under the hood. 
+ If an exception occurs in an async route, the execution 
+ is automatically passed to the error-handling middleware.
+*/
 notesRouter.delete("/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    await Note.findByIdAndDelete(id);
-    res.status(204).end();
-  } catch (exception) {
-    next(error);
-  }
+  const { id } = req.params;
+  await Note.findByIdAndDelete(id);
+  res.status(204).end();
 });
 
 notesRouter.put("/:id", async (req, res, next) => {
@@ -52,6 +50,12 @@ notesRouter.put("/:id", async (req, res, next) => {
     .catch((error) => next(error));
 });
 
+/*
+ we do not need the next(exception) call anymore.
+  The library handles everything under the hood. 
+ If an exception occurs in an async route, the execution 
+ is automatically passed to the error-handling middleware.
+*/
 notesRouter.post("/", async (request, response, next) => {
   const body = request.body;
 
@@ -66,12 +70,8 @@ notesRouter.post("/", async (request, response, next) => {
     important: Boolean(body.important) || false,
   });
 
-  try {
-    const savedNote = await note.save();
-    response.status(201).json(savedNote);
-  } catch (exception) {
-    next(exception);
-  }
+  const savedNote = await note.save();
+  response.status(201).json(savedNote);
 });
 
 module.exports = notesRouter;
