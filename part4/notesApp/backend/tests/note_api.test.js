@@ -15,12 +15,26 @@ const helper = require("./test_helper");
 
 beforeEach(async () => {
   await Note.deleteMany({});
-  //let noteObject = new Note(initialNotes[0]);
-  // let noteObject = new Note(helper.initialNotes[0]);
-  // await noteObject.save();
-  // noteObject = new Note(helper.initialNotes[1]);
-  // await noteObject.save();
-  await Note.insertMany(helper.initialNotes);
+  /*
+  The noteObjects variable is assigned to an array of Mongoose objects that are 
+  created with the Note constructor for each of the notes in the helper.initialNotes array.
+  */
+
+  const noteObjects = helper.initialNotes.map((note) => new Note(note));
+  /*
+   promiseArray=> creates a new array that consists of promises, that are created by calling the save method 
+   of each item in the noteObjects array. In other words, it is an array of promises for saving 
+   each of the items to the database.
+  
+  */
+  const promiseArray = noteObjects.map((note) => note.save());
+  /*
+  The Promise.all method can be used for transforming an array of promises into a single promise, that will be fulfilled
+   once every promise in the array passed to it as a parameter is resolved
+  - Promise.all(promiseArray) waits until every promise for saving a note is finished, meaning that the database 
+  has been initialized.
+  */
+  await Promise.all(promiseArray);
 });
 
 //The tests only use the Express application defined in the app.js file, which does not listen to any ports:defined in index.js
