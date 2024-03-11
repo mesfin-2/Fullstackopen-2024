@@ -1,10 +1,6 @@
 const { test } = require("node:test");
 const assert = require("node:assert");
 const list = require("../utils/list_helper");
-const supertest = require("supertest");
-const app = require("../app");
-
-const api = supertest(app);
 
 test("dummy returns one", () => {
   const blogs = [];
