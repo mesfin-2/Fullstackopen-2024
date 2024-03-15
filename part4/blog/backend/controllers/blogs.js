@@ -1,3 +1,4 @@
+const { request } = require("../app");
 const Blog = require("../models/blog");
 const logger = require("../utils/logger");
 
@@ -34,6 +35,18 @@ blogRouter.post("/", async (request, response) => {
   // .catch((error) => {
   //   logger.error(`Blog not created, ${error.message}`);
   // });
+});
+
+blogRouter.put("/:id", async (request, response) => {
+  const { id } = request.params;
+  const { likes } = request.body;
+
+  const blog = {
+    likes: likes,
+  };
+
+  const updateBlog = await Blog.findByIdAndUpdate(id, blog, { new: true });
+  response.status(204).json(updateBlog).end();
 });
 
 module.exports = blogRouter;

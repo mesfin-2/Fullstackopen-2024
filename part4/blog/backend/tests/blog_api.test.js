@@ -126,6 +126,27 @@ test("delete single blog post", async () => {
   const contents = blogsAtEnd.map((r) => r.title);
   assert(!contents.includes(blogToDelete.title));
 });
+
+test("update a single blog likes", async () => {
+  const blogsAtStart = await helpers.blogsInDb();
+  const blogToUpdate = blogsAtStart[0];
+  const updatedLikes = 4; // Define the updated likes value
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send({ likes: updatedLikes }) // Send the updated likes value in the request body
+    .expect(204);
+
+  const blogsAtEnd = await helpers.blogsInDb();
+
+  // Find the updated blog in the array
+  const updatedBlog = blogsAtEnd.find((blog) => blog.id === blogToUpdate.id);
+  console.log("Updated blog:", updatedBlog);
+
+  // Assert that the likes of the updated blog match the updatedLikes value
+  assert.strictEqual(updatedBlog.likes, updatedLikes);
+});
+
 //after Each test
 after(async () => {
   await mongoose.connection.close();
