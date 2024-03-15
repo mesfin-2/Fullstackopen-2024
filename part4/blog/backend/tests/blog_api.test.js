@@ -84,6 +84,18 @@ test("add a valid blog post ", async () => {
   assert(contents.includes(newBlog.title));
 });
 
+test("likes property is missing from the request", async () => {
+  //   const newBlog = {
+  //     title: "FullStack app development2",
+  //     author: "Mesfin M",
+  //     url: "https://blog.nextideatech.com/how-to-get-started-with-the-mern-stack-a-comprehensive-guide/",
+  //   };
+  await api.post("/api/blogs").send({ likes: 0 }).expect(201);
+  //check the state stored in the database after the saving operation, by fetching all the notes of the application.
+  const blogsAtEnd = await Blog.find({});
+  assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length + 1);
+});
+
 //after Each test
 after(async () => {
   await mongoose.connection.close();
