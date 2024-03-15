@@ -72,15 +72,15 @@ test("add a valid blog post ", async () => {
     .expect("Content-Type", /application\/json/);
 
   //check the state stored in the database after the saving operation, by fetching all the blogs of the application.
-  const blogsAtEnd = await Blog.find({});
+  const blogsAtEnd = await helpers.blogsInDb();
 
   assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length + 1);
 
   // Convert blog objects to JSON
-  const blogObjects = blogsAtEnd.map((blog) => blog.toJSON());
+  //const blogObjects = blogsAtEnd.map((blog) => blog.toJSON());
 
   // Check if the new blog post's title is included in the saved blogs
-  const contents = blogObjects.map((n) => n.title);
+  const contents = blogsAtEnd.map((n) => n.title);
   assert(contents.includes(newBlog.title));
 });
 
@@ -107,7 +107,7 @@ test("title or url properties are missing from the request ", async () => {
   };
   await api.post("/api/blogs").send(newBlog).expect(400);
   //check the state stored in the database after the saving operation, by fetching all the notes of the application.
-  const blogsAtEnd = await Blog.find({});
+  const blogsAtEnd = await helpers.blogsInDb();
   assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length);
 });
 //after Each test

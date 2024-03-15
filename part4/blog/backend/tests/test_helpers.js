@@ -1,3 +1,5 @@
+const Blog = require("../models/blog");
+
 const initialBlogs = [
   {
     title: "MERN app guideline",
@@ -19,6 +21,14 @@ const initialBlogs = [
   },
 ];
 
+//function that can be used for checking the blogs stored in the database.
+const blogsInDb = async () => {
+  const blogs = await Blog.find({});
+
+  return blogs.map((blog) => blog.toJSON());
+};
+
 module.exports = {
   initialBlogs,
+  blogsInDb,
 };
