@@ -1,4 +1,5 @@
 const notesRouter = require("express").Router();
+const mongoose = require("mongoose");
 const Note = require("../models/note");
 
 notesRouter.get("/", async (req, res) => {
@@ -6,8 +7,14 @@ notesRouter.get("/", async (req, res) => {
   res.json(notes);
 });
 
-notesRouter.get("/:id", async (req, res, next) => {
+notesRouter.get("/:id", async (req, res) => {
   const { id } = req.params;
+
+  // Check if id is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: "Invalid id" });
+  }
+
   const note = await Note.findById(id);
 
   //res.json(note);

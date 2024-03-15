@@ -14,7 +14,7 @@ const initialNotes = [
 ];
 //function ahead of time, which can be used for creating a database object ID
 // that does not belong to any note object in the database.
-const nonExistedId = async () => {
+const nonExistingId = async () => {
   const note = new Note({ content: "willremovesoon" });
   await note.save();
   await note.deleteOne();
@@ -30,6 +30,6 @@ const notesInDb = async () => {
 
 module.exports = {
   initialNotes,
-  nonExistedId,
+  nonExistingId,
   notesInDb,
 };
