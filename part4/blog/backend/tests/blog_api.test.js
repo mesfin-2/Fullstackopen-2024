@@ -33,7 +33,7 @@ beforeEach(async () => {
   await Promise.all(promiseArray);
 });
 
-test.only("There is only three blog posts", async () => {
+test("There is only three blog posts", async () => {
   const response = await api.get("/api/blogs");
 
   assert.strictEqual(response.body.length, helpers.initialBlogs.length);
@@ -109,6 +109,22 @@ test("title or url properties are missing from the request ", async () => {
   //check the state stored in the database after the saving operation, by fetching all the notes of the application.
   const blogsAtEnd = await helpers.blogsInDb();
   assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length);
+});
+
+test("delete single blog post", async () => {
+  const blogsAtStart = await helpers.blogsInDb();
+  console.log("blogAtStart", blogsAtStart);
+  const blogToDelete = blogsAtStart[0];
+  console.log("blogToDelete", blogToDelete);
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+  const blogsAtEnd = await helpers.blogsInDb();
+
+  assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length - 1);
+
+  const contents = blogsAtEnd.map((r) => r.title);
+  assert(!contents.includes(blogToDelete.title));
 });
 //after Each test
 after(async () => {
