@@ -1,4 +1,5 @@
 const notesRouter = require("express").Router();
+const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const Note = require("../models/note");
 const User = require("../models/user");
@@ -58,6 +59,14 @@ notesRouter.put("/:id", async (req, res, next) => {
     })
     .catch((error) => next(error));
 });
+//Isolates the token from the authorization header.
+const getTokenFrom = (request) => {
+  const authorization = request.get("authorization");
+  if (authorization && authorization.startsWith("Bearer")) {
+    return authorization.replace("Bearer ", "");
+  }
+  return null;
+};
 
 /*
  we do not need the next(exception) call anymore.
@@ -67,9 +76,23 @@ notesRouter.put("/:id", async (req, res, next) => {
 */
 notesRouter.post("/", async (request, response, next) => {
   const body = request.body;
+  //The validity of the token is checked with jwt.verify.
+  //The method also decodes the token, or returns the Object which the token was based on.
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET);
+  /*
+  
+  If the object decoded from the token does not contain the user's identity (decodedToken.id is undefined), error status
+ code 401 unauthorized is returned and the reason for the failure is explained in the response body.
+  */
 
-  const user = await User.findById(body.userId);
-  console.log("user", user);
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token invalid" });
+  }
+
+  //const user = await User.findById(body.userId);
+  //The object decoded from the token contains the username and id fields, which tell the server who made the request.
+  const user = await User.findById(decodedToken.id);
+  //console.log("user", user);
 
   if (!body.content || undefined) {
     return response.status(400).json({
