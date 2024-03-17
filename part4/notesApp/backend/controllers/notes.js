@@ -1,9 +1,11 @@
 const notesRouter = require("express").Router();
 const mongoose = require("mongoose");
 const Note = require("../models/note");
+const User = require("../models/user");
 
 notesRouter.get("/", async (req, res) => {
-  const notes = await Note.find({});
+  const notes = await Note.find({}).populate("user", { username: 1, name: 1 });
+  console.log("notes from API", notes);
   res.json(notes);
 });
 
@@ -66,18 +68,26 @@ notesRouter.put("/:id", async (req, res, next) => {
 notesRouter.post("/", async (request, response, next) => {
   const body = request.body;
 
+  const user = await User.findById(body.userId);
+  console.log("user", user);
+
   if (!body.content || undefined) {
     return response.status(400).json({
       error: "content missing",
     });
   }
+  //the user who created a note is sent in the userId field of the request body:
 
   const note = new Note({
     content: body.content,
     important: Boolean(body.important) || false,
+    user: user.id,
   });
 
   const savedNote = await note.save();
+  user.notes = user.notes.concat(savedNote._id);
+  await user.save();
+  console.log("userNotes", user.notes);
   response.status(201).json(savedNote);
 });
 
