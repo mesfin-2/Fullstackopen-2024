@@ -7,6 +7,11 @@ const noteSchema = new mongoose.Schema({
     required: true,
   },
   important: Boolean,
+  user: {
+    //the note references the user who created it, and the user has an array of references to all of the notes created by them.
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
 //Transform The mongoose _id object to id

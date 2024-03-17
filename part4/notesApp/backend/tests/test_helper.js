@@ -1,4 +1,5 @@
 const Note = require("../models/note");
+const User = require("../models/user");
 
 //Let's initialize the database before every test with the beforeEach function:
 
@@ -27,9 +28,16 @@ const notesInDb = async () => {
 
   return notes.map((note) => note.toJSON());
 };
+//function that can be used for checking the users stored in the database.
+const usersInDb = async () => {
+  const users = await User.find({});
+
+  return users.map((user) => user.toJSON());
+};
 
 module.exports = {
   initialNotes,
   nonExistingId,
   notesInDb,
+  usersInDb,
 };
