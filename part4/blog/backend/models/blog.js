@@ -19,6 +19,12 @@ const blogSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
+
+  user: {
+    //the note references the user who created it, and the user has an array of references to all of the blogs created by them.
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 blogSchema.set("toJSON", {
   transform: (document, returnedObject) => {
