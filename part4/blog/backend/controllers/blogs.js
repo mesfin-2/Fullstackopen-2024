@@ -22,10 +22,12 @@ blogRouter.delete("/:id", async (req, res) => {
 });
 
 blogRouter.post("/", async (req, res) => {
-  const { title, url, userId } = req.body;
+  const { title, url, author, likes, userId } = req.body;
 
-  if (!title || !url) {
-    return res.status(400).json({ error: "Title and URL are required" });
+  if (!title || !url || !author) {
+    return res
+      .status(400)
+      .json({ error: "Title  URL and Author are required" });
   }
 
   const user = await User.findById(userId);
@@ -37,7 +39,9 @@ blogRouter.post("/", async (req, res) => {
 
   const newBlog = new Blog({
     title,
+    author,
     url,
+    likes: likes || 0, //If likes is missing default is 0
     user: user.id,
   });
 

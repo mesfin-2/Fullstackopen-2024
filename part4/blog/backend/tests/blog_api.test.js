@@ -70,10 +70,7 @@ describe("Blog API", () => {
         author: "Mesfin M",
         url: "https://blog.nextideatech.com/how-to-get-started-with-the-mern-stack-a-comprehensive-guide/",
       };
-      await api
-        .post("/api/blogs")
-        .send({ ...newBlog, likes: 0 })
-        .expect(201);
+      await api.post("/api/blogs").send(newBlog).expect(201);
       const blogsAtEnd = await Blog.find({});
       assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length + 1);
     });
