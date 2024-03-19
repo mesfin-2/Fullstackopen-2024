@@ -63,7 +63,27 @@ describe("when there is initially one user in db", () => {
 
       console.log("Actual error message:", result.body.error);
 
-      assert.ok(result.body.error.includes("Username already taken"));
+      assert.strictEqual(result.body.error, "Username already taken");
     }
   );
+  test("creation username and password must be more than three characters", async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: "me",
+      name: "Mesfin T",
+      password: "pa",
+    };
+
+    const response = await api.post("/api/users").send(newUser).expect(400);
+
+    assert(
+      response.body.error.includes(
+        "Password and username length too short, must be greater than 3"
+      )
+    );
+
+    //const usersAtEnd = await helper.usersInDb();
+    //expect(usersAtEnd.length).toBe(usersAtStart.length);
+  });
 });
