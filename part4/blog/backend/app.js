@@ -1,7 +1,7 @@
 const cors = require("cors");
 const express = require("express");
-const blogRouter = require("./controllers/blogs");
-const userRouter = require("./controllers/users");
+const blogsRouter = require("./routes/blogs-route");
+const userRouter = require("./routes/users-route");
 const {
   requestLogger,
   errorHandler,
@@ -24,7 +24,7 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
-app.use("/api/blogs", blogRouter);
+app.use("/api/blogs", blogsRouter);
 app.use("/api/users", userRouter);
 
 app.use(requestLogger);

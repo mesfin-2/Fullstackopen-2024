@@ -91,11 +91,9 @@ test("likes property is missing from the request", async () => {
     author: "Mesfin M",
     url: "https://blog.nextideatech.com/how-to-get-started-with-the-mern-stack-a-comprehensive-guide/",
   };
-  await api
-    .post("/api/blogs")
-    .send({ ...newBlog, likes: 0 })
-    .expect(201);
+  await api.post("/api/blogs").send(newBlog).expect(201);
   //check the state stored in the database after the saving operation, by fetching all the notes of the application.
+
   const blogsAtEnd = await Blog.find({});
   assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length + 1);
 });
@@ -113,9 +111,9 @@ test("title or url properties are missing from the request ", async () => {
 
 test("delete single blog post", async () => {
   const blogsAtStart = await helpers.blogsInDb();
-  console.log("blogAtStart", blogsAtStart);
+  //console.log("blogAtStart", blogsAtStart);
   const blogToDelete = blogsAtStart[0];
-  console.log("blogToDelete", blogToDelete);
+  //console.log("blogToDelete", blogToDelete);
 
   await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
 
@@ -141,7 +139,7 @@ test("update a single blog likes", async () => {
 
   // Find the updated blog in the array
   const updatedBlog = blogsAtEnd.find((blog) => blog.id === blogToUpdate.id);
-  console.log("Updated blog:", updatedBlog);
+  //console.log("Updated blog:", updatedBlog);
 
   // Assert that the likes of the updated blog match the updatedLikes value
   assert.strictEqual(updatedBlog.likes, updatedLikes);

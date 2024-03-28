@@ -22,6 +22,14 @@ const initialBlogs = [
   },
 ];
 
+const initialUsers = [
+  {
+    username: "admin",
+    name: "Admin T",
+    password: "123456",
+  },
+];
+
 //function that can be used for checking the blogs stored in the database.
 const blogsInDb = async () => {
   const blogs = await Blog.find({});
@@ -39,4 +47,5 @@ module.exports = {
   initialBlogs,
   blogsInDb,
   usersInDb,
+  initialUsers,
 };

@@ -1,9 +1,7 @@
-const { setMaxListeners, findOne } = require("../models/blog");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const userRouter = require("express").Router();
 
-userRouter.post("/", async (req, res) => {
+const createUser = async (req, res) => {
   const { username, password, name } = req.body;
 
   /**
@@ -38,15 +36,18 @@ userRouter.post("/", async (req, res) => {
   const savedUser = await newUser.save();
 
   res.status(201).json(savedUser);
-});
+};
 
-userRouter.get("/", async (req, res) => {
+const getAllUsers = async (req, res) => {
   const users = await User.find({}).populate("blogs", {
-    url: 1,
     title: 1,
+    url: 1,
     author: 1,
   });
-  res.status(200).send(users);
-});
+  res.status(200).json(users);
+};
 
-module.exports = userRouter;
+module.exports = {
+  createUser,
+  getAllUsers,
+};
