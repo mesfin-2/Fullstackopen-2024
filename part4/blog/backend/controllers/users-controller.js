@@ -30,7 +30,7 @@ const createUser = async (req, res) => {
   const newUser = new User({
     username,
     name,
-    passwordHash, //we don't want to store the password into db, we store hashed pw
+    passwordHash, //we don't want to store the original password into db, we store hashed pw
   });
 
   const savedUser = await newUser.save();
