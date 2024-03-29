@@ -1,9 +1,8 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const loginRouter = require("express").Router();
-const User = require("../models/user");
+const User = require("../models/user-model");
 
-loginRouter.post("/", async (req, res) => {
+const login = async (req, res) => {
   const { username, password } = req.body;
 
   //searching for the user from the database by the username attached to the request.
@@ -31,6 +30,6 @@ loginRouter.post("/", async (req, res) => {
   });
 
   res.status(200).send({ token, username: user.username, name: user.name });
-});
+};
 
-module.exports = loginRouter;
+module.exports = login;

@@ -1,16 +1,16 @@
-const notesRouter = require("express").Router();
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const Note = require("../models/note");
-const User = require("../models/user");
+const Note = require("../models/note-model");
+const User = require("../models/user-model");
+const getTokenFrom = require("../utils/getToken");
 
-notesRouter.get("/", async (req, res) => {
+const getAllNotes = async (req, res) => {
   const notes = await Note.find({}).populate("user", { username: 1, name: 1 });
   console.log("notes from API", notes);
   res.json(notes);
-});
+};
 
-notesRouter.get("/:id", async (req, res) => {
+const getAnote = async (req, res) => {
   const { id } = req.params;
 
   // Check if id is a valid ObjectId
@@ -24,23 +24,24 @@ notesRouter.get("/:id", async (req, res) => {
   if (note) {
     res.json(note);
   } else {
-    res.status(404).end();
+    res.status(404).json({ message: "note not found" }).end();
   }
-});
+};
 
 /*
  we do not need the next(exception) call anymore.
-  The library handles everything under the hood. 
+  The Express_async_Error handles everything under the hood. 
  If an exception occurs in an async route, the execution 
  is automatically passed to the error-handling middleware.
 */
-notesRouter.delete("/:id", async (req, res, next) => {
+
+const deleteNote = async (req, res) => {
   const { id } = req.params;
   await Note.findByIdAndDelete(id);
-  res.status(204).end();
-});
+  res.status(204).json({ message: "note deleted Successfully" }).end();
+};
 
-notesRouter.put("/:id", async (req, res, next) => {
+const updateNote = async (req, res, next) => {
   const { id } = req.params;
   const { content, important } = req.body;
 
@@ -53,46 +54,40 @@ notesRouter.put("/:id", async (req, res, next) => {
     new: true,
     runValidators: true,
     context: "query",
-  })
-    .then((updatedNote) => {
-      res.json(updatedNote);
-    })
-    .catch((error) => next(error));
-});
-//Isolates the token from the authorization header.
-const getTokenFrom = (request) => {
-  const authorization = request.get("authorization");
-  if (authorization && authorization.startsWith("Bearer")) {
-    return authorization.replace("Bearer ", "");
-  }
-  return null;
+  });
+  res.status(200).json(updatedNote);
 };
 
-/*
- we do not need the next(exception) call anymore.
-  The library handles everything under the hood. 
- If an exception occurs in an async route, the execution 
- is automatically passed to the error-handling middleware.
-*/
-notesRouter.post("/", async (request, response, next) => {
+const createNote = async (request, response) => {
   const body = request.body;
   //The validity of the token is checked with jwt.verify.
   //The method also decodes the token, or returns the Object which the token was based on.
   const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET);
-  /*
-  
-  If the object decoded from the token does not contain the user's identity (decodedToken.id is undefined), error status
- code 401 unauthorized is returned and the reason for the failure is explained in the response body.
-  */
+  console.log("decodedToken", decodedToken);
+  /*    
+    If the object decoded from the token does not contain the user's identity (decodedToken.id is undefined), error status
+   code 401 unauthorized is returned and the reason for the failure is explained in the response body.
+    */
 
   if (!decodedToken.id) {
     return response.status(401).json({ error: "token invalid" });
   }
 
+  // Extract user ID from token payload
+  const userId = body.userId;
+
+  //Retrieve user from db
+  if (!userId) {
+    return response.status(400).json({ error: "userId missing in request" });
+  }
   //const user = await User.findById(body.userId);
   //The object decoded from the token contains the username and id fields, which tell the server who made the request.
-  const user = await User.findById(decodedToken.id);
+  const user = await User.findById(userId);
   //console.log("user", user);
+  // Check if user exists
+  if (!user) {
+    return response.status(404).json({ error: "User not found" });
+  }
 
   if (!body.content || undefined) {
     return response.status(400).json({
@@ -100,18 +95,29 @@ notesRouter.post("/", async (request, response, next) => {
     });
   }
   //the user who created a note is sent in the userId field of the request body:
+  const { content, important, username } = request.body;
 
   const note = new Note({
-    content: body.content,
-    important: Boolean(body.important) || false,
-    user: user.id,
+    content: content,
+    important: Boolean(important) || false,
+    user: userId,
+    username: username,
   });
 
   const savedNote = await note.save();
+
+  // Add note to user's notes list
   user.notes = user.notes.concat(savedNote._id);
   await user.save();
+
   console.log("userNotes", user.notes);
   response.status(201).json(savedNote);
-});
+};
 
-module.exports = notesRouter;
+module.exports = {
+  getAllNotes,
+  getAnote,
+  deleteNote,
+  updateNote,
+  createNote,
+};

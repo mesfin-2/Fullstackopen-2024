@@ -2,12 +2,12 @@ const config = require("./utils/config");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const notesRouter = require("./controllers/notes");
+const notesRouter = require("./routes/notes-route");
 const middleware = require("./utils/middleware");
 const logger = require("./utils/logger");
 const mongoose = require("mongoose");
-const usersRouter = require("./controllers/users");
-const loginRouter = require("./controllers/login");
+const usersRouter = require("./routes/users-route");
+const authRouter = require("./routes/auth-route");
 
 mongoose.set("strictQuery", false);
 
@@ -29,7 +29,7 @@ app.use(middleware.requestLogger);
 
 app.use("/api/notes", notesRouter);
 app.use("/api/users", usersRouter);
-app.use("/api/login", loginRouter);
+app.use("/api/login", authRouter);
 
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
