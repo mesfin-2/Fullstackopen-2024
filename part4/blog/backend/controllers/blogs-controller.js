@@ -1,6 +1,5 @@
 const Blog = require("../models/blog");
 const User = require("../models/user");
-const getTokenFrom = require("../utils/verifyToken");
 const jwt = require("jsonwebtoken");
 
 const getAllBlogs = async (req, res) => {
@@ -18,7 +17,7 @@ const createBlog = async (request, response) => {
 
   console.log("id from body request", userId);
   //Extract token from the request
-  const token = getTokenFrom(request);
+  const token = request.token;
   console.log("Token", token);
 
   // Check if token is present

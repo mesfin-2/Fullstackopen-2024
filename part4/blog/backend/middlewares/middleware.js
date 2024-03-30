@@ -1,4 +1,4 @@
-const logger = require("./logger");
+const logger = require("../utils/logger");
 
 const requestLogger = (request, response, next) => {
   logger.info("Method:", request.method);
@@ -37,8 +37,20 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
+//Isolates the token from the authorization header.
+const tokenExtractor = (request, response, next) => {
+  const authorization = request.get("authorization");
+  //console.log("authorization", authorization);
+  if (authorization && authorization.startsWith("Bearer")) {
+    return authorization.replace("Bearer ", "");
+  }
+  return null;
+  next();
+};
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor,
 };
