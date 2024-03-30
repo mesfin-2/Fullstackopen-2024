@@ -1,5 +1,7 @@
 const Blog = require("../models/blog");
 const User = require("../models/user");
+const getTokenFrom = require("../utils/verifyToken");
+const jwt = require("jsonwebtoken");
 
 const getAllBlogs = async (req, res) => {
   const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
@@ -11,14 +13,32 @@ const getAllBlogs = async (req, res) => {
   // });
 };
 
-const createBlog = async (req, res) => {
-  const { title, url, author, likes = 0, userId } = req.body;
-  // Get any user from the database to assign as the creator of the blog
-  const user = await User.findById(userId);
-  //console.log("user_id", user);
+const createBlog = async (request, response) => {
+  const { title, url, author, likes = 0, userId } = request.body;
+
+  console.log("id from body request", userId);
+  //Extract token from the request
+  const token = getTokenFrom(request);
+  console.log("Token", token);
+
+  // Check if token is present
+  if (!token) {
+    return response.status(401).json({ error: "Token must be provided" });
+  }
+
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+  console.log("id from decoded token", decodedToken.id);
+
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "Token invalid" });
+  }
+
+  // Get  user from the database to assign as the creator of the blog
+  const user = await User.findById(decodedToken.id);
+  console.log("user_id", user);
 
   if (!user) {
-    return res.status(400).json({ error: "User not found" });
+    return response.status(404).json({ error: "User not found" });
   }
 
   if (!title || !url || !author) {
@@ -26,20 +46,22 @@ const createBlog = async (req, res) => {
       .status(400)
       .json({ error: "Title  URL and Author are required" });
   }
-
+  // Create a new blog with the user ID
   const newBlog = new Blog({
     title,
     author,
     likes,
     url,
-    user: user._id,
+    user: userId,
   });
 
   const savedBlog = await newBlog.save();
+  // Update user's list of blogs
   user.blogs = user.blogs.concat(savedBlog._id);
   await user.save();
 
-  res.status(201).json(savedBlog);
+  console.log("userBlogs", user.blogs);
+  response.status(201).json(savedBlog);
 
   // .catch((error) => {
   //   logger.error(`Blog not created, ${error.message}`);

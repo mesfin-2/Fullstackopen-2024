@@ -12,7 +12,7 @@ const login = async (req, res) => {
     user == null ? false : await bcrypt.compare(password, user.passwordHash);
 
   //checks the password, also attached to the request.
-  if (!(user && passwordCorrect)) {
+  if (!user && !passwordCorrect) {
     return res.status(401).json({
       error: "invalid username or password",
     });
@@ -25,11 +25,21 @@ const login = async (req, res) => {
 
   //If the password is correct, a token is created with the method jwt.sign.
   // token expires in 60*60 seconds, that is, in one hour
-  const token = jwt.sign(userForToken, process.env.SECRET, {
+  // If user successfully logged in, generate a JWT token
+  const token = jwt.sign({ id: user._id }, process.env.SECRET, {
     expiresIn: 60 * 60,
   });
-
   res.status(200).send({ token, username: user.username, name: user.name });
+
+  // res
+  //   .status(200)
+  //   .send({ token, username: user.username, name: user.name, id: user._id });
+
+  // Set the token into a cookie
+  // res
+  //   .cookie("user_token", token, { httpOnly: true, path: "/" })
+  //   .status(200)
+  //   .json(userForToken); //everything except password
 };
 
 module.exports = login;
