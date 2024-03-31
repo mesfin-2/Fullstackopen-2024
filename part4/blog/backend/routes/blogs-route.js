@@ -6,9 +6,8 @@ const logger = require("../utils/logger");
 
 const blogRouter = require("express").Router();
 
-blogRouter.get("/", blog.getAllBlogs);
-
 blogRouter.delete("/:id", blog.deleteBlog);
+blogRouter.get("/", blog.getAllBlogs);
 
 blogRouter.post("/", blog.createBlog);
 

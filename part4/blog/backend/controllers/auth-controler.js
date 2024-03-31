@@ -27,7 +27,7 @@ const login = async (req, res) => {
   // token expires in 60*60 seconds, that is, in one hour
   // If user successfully logged in, generate a JWT token
   const token = jwt.sign({ id: user._id }, process.env.SECRET, {
-    expiresIn: 60 * 60,
+    expiresIn: "24h",
   });
   res.status(200).send({ token, username: user.username, name: user.name });
 

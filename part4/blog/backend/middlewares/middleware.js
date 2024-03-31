@@ -42,9 +42,13 @@ const tokenExtractor = (request, response, next) => {
   const authorization = request.get("authorization");
   //console.log("authorization", authorization);
   if (authorization && authorization.startsWith("Bearer")) {
-    return authorization.replace("Bearer ", "");
+    // Attach the extracted token to the request object
+
+    request.token = authorization.replace("Bearer ", "");
+  } else {
+    request.token = null;
   }
-  return null;
+
   next();
 };
 

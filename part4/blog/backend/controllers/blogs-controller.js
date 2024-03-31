@@ -13,9 +13,9 @@ const getAllBlogs = async (req, res) => {
 };
 
 const createBlog = async (request, response) => {
-  const { title, url, author, likes = 0, userId } = request.body;
+  const { title, url, author, likes = 0 } = request.body;
 
-  console.log("id from body request", userId);
+  //console.log("id from body request", userId);
   //Extract token from the request
   const token = request.token;
   console.log("Token", token);
@@ -28,9 +28,9 @@ const createBlog = async (request, response) => {
   const decodedToken = jwt.verify(token, process.env.SECRET);
   console.log("id from decoded token", decodedToken.id);
 
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "Token invalid" });
-  }
+  // if (!decodedToken.id) {
+  //   return response.status(401).json({ error: "Token invalid" });
+  // }
 
   // Get  user from the database to assign as the creator of the blog
   const user = await User.findById(decodedToken.id);
@@ -51,7 +51,7 @@ const createBlog = async (request, response) => {
     author,
     likes,
     url,
-    user: userId,
+    user: user._id,
   });
 
   const savedBlog = await newBlog.save();
@@ -67,10 +67,31 @@ const createBlog = async (request, response) => {
   // });
 };
 
-const deleteBlog = async (req, res) => {
-  const { id } = req.params;
-  await Blog.findByIdAndDelete(id);
-  res.status(204).end();
+const deleteBlog = async (request, response, next) => {
+  try {
+    const { id } = request.params;
+    const token = request.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    const blog = await Blog.findById(id);
+    const user = await User.findById(decodedToken.id);
+
+    // Check if the blog exists
+    if (!blog) {
+      return response.status(404).json({ error: "Blog not found" });
+    }
+
+    // Check if the authenticated user is the creator of the blog
+    if (blog.user.toString() !== decodedToken.id) {
+      return response.status(403).json({ error: "Unauthorized" });
+    }
+
+    // Delete the blog
+    await Blog.findByIdAndDelete(id);
+    response.status(204).json({ message: "Blog successfully deleted" }).end();
+  } catch (error) {
+    // Pass the error to the error handler middleware
+    next(error);
+  }
 };
 
 const updateBlog = async (req, res) => {
