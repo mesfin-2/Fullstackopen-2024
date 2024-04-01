@@ -8,6 +8,7 @@ const helpers = require("./test_helpers");
 const User = require("../models/user");
 const { log } = require("console");
 const api = supertest(app);
+const jwt = require("jsonwebtoken");
 
 // Define a describe block for blog-related tests
 describe("Blog API", () => {
@@ -48,91 +49,106 @@ describe("Blog API", () => {
   // Define a describe block for POST requests
   describe("POST requests", () => {
     test("add a valid blog post ", async () => {
-      const users = await User.find({});
-      //const randomUser = users[Math.floor(Math.random() * users.length)];
-      const rootUser = users[0];
-      console.log("rootUser", rootUser);
+      const token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDgwZTdmOTFiNThhZTNkOWFmMGRkYSIsImlhdCI6MTcxMTk4OTQyNiwiZXhwIjoxNzEyMDc1ODI2fQ.UasQ-ytoMi4tnxKtm8DKOVZ5zCoh-r1EFZXZ5vBOd-4";
+      const decodedToken = jwt.verify(token, process.env.SECRET);
+      console.log("token-from-test", decodedToken.id);
 
       const newBlog = {
         title: "MERN-Stack app development",
         author: "Mesfin M",
         url: "https://blog.nextideatech.com/how-to-get-started-with-the-mern-stack-a-comprehensive-guide/",
-        user: rootUser._id,
+        likes: 2,
+        user: decodedToken.id,
       };
-      await api
+      const response = await api
         .post("/api/blogs")
+        .set("Authorization", `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect("Content-Type", /application\/json/);
-      const blogsAtEnd = await helpers.blogsInDb();
-      assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length + 1);
-      const contents = blogsAtEnd.map((n) => n.title);
-      assert(contents.includes(newBlog.title));
+      const blogsAtEnd1 = await helpers.blogsInDb();
+      assert.strictEqual(blogsAtEnd1.length, helpers.initialBlogs.length + 1);
+      const contents1 = blogsAtEnd1.map((n) => n.title);
+      assert(contents1.includes(newBlog.title));
+
+      //Test delete alone, otherwise its affecting other test specially the test for counting all blog posts
+      //  DELETE requests
+
+      // const blogsAtStart = await helpers.blogsInDb();
+      // const blogToDelete = response.body;
+
+      // await api
+      //   .delete(`/api/blogs/${blogToDelete.id}`)
+      //   .set("Authorization", `Bearer ${token}`)
+      //   .expect(204);
+
+      // const blogsAtEnd = await helpers.blogsInDb();
+
+      // assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length - 1);
+
+      // const contents = blogsAtEnd.map((r) => r.title);
+      // assert(!contents.includes(blogToDelete.title));
+
+      // PUT requests
+
+      const blogsAtStart2 = await helpers.blogsInDb();
+      const blogToUpdate = response.body;
+      const updatedLikes = 4;
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send({ likes: updatedLikes })
+        .expect(204);
+
+      const blogsAtEnd2 = await helpers.blogsInDb();
+      const contents2 = blogsAtEnd2.map((r) => r.title);
+
+      const updatedBlog = blogsAtEnd2.find(
+        (blog) => blog.id === blogToUpdate.id
+      );
+      //console.log("Updated blog:", updatedBlog);
+
+      assert.strictEqual(updatedBlog.likes, updatedLikes);
     });
-    // test("likes property is missing from the request", async () => {
-    //   const newBlog = {
-    //     title: "FullStack app development2",
-    //     author: "Mesfin M",
-    //     url: "https://blog.nextideatech.com/how-to-get-started-with-the-mern-stack-a-comprehensive-guide/",
-    //   };
-    //   const response = await api.post("/api/blogs").send(newBlog).expect(201);
-    //   const { likes } = response.body;
-    //   assert.strictEqual(likes, 0);
-    //   const blogsAtEnd = await Blog.find({});
-    //   assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length + 1);
-    // });
-    // test("title or url properties are missing from the request ", async () => {
-    //   const newBlog = {
-    //     author: "Mesfin M",
-    //     likes: 2,
-    //   };
-    //   await api.post("/api/blogs").send(newBlog).expect(400);
-    //   const blogsAtEnd = await helpers.blogsInDb();
-    //   assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length);
-    // });
   });
+  // test("assign a 0 value for missing likes from the request", async () => {
+  //   const token =
+  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDgwZTdmOTFiNThhZTNkOWFmMGRkYSIsImlhdCI6MTcxMTk4OTQyNiwiZXhwIjoxNzEyMDc1ODI2fQ.UasQ-ytoMi4tnxKtm8DKOVZ5zCoh-r1EFZXZ5vBOd-4";
+  //   const decodedToken = jwt.verify(token, process.env.SECRET);
 
-  // Define a describe block for DELETE requests
-  // describe("DELETE requests", () => {
-  //   test("delete single blog post", async () => {
-  //     const blogsAtStart = await helpers.blogsInDb();
-  //     //console.log("blogAtStart", blogsAtStart);
-  //     const blogToDelete = blogsAtStart[0];
-  //     //console.log("blogToDelete", blogToDelete);
-
-  //     await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
-
-  //     const blogsAtEnd = await helpers.blogsInDb();
-
-  //     assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length - 1);
-
-  //     const contents = blogsAtEnd.map((r) => r.title);
-  //     assert(!contents.includes(blogToDelete.title));
-  //   });
+  //   const newBlog = {
+  //     title: "FullStack app development2",
+  //     author: "Mesfin M",
+  //     url: "https://blog.nextideatech.com/how-to-get-started-with-the-mern-stack-a-comprehensive-guide/",
+  //     user: decodedToken.id,
+  //   };
+  //   const response = await api
+  //     .post("/api/blogs")
+  //     .set("Authorization", `Bearer ${token}`)
+  //     .send(newBlog)
+  //     .expect(201);
+  //   const { likes } = response.body;
+  //   assert.strictEqual(likes, 0);
+  //   const blogsAtEnd = await Blog.find({});
+  //   assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length + 1);
   // });
-
-  // Define a describe block for PUT requests
-  // describe("PUT requests", () => {
-  //   test("update a single blog likes", async () => {
-  //     const blogsAtStart = await helpers.blogsInDb();
-  //     const blogToUpdate = blogsAtStart[0];
-  //     const updatedLikes = 4;
-
-  //     await api
-  //       .put(`/api/blogs/${blogToUpdate.id}`)
-  //       .send({ likes: updatedLikes })
-  //       .expect(204);
-
-  //     const blogsAtEnd = await helpers.blogsInDb();
-
-  //     const updatedBlog = blogsAtEnd.find(
-  //       (blog) => blog.id === blogToUpdate.id
-  //     );
-  //     //console.log("Updated blog:", updatedBlog);
-
-  //     assert.strictEqual(updatedBlog.likes, updatedLikes);
-  //   });
-  // });
+  // test("No blog creation if title or url are missing from the request ", async () => {
+  //   const token =
+  //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDgwZTdmOTFiNThhZTNkOWFmMGRkYSIsImlhdCI6MTcxMTk4OTQyNiwiZXhwIjoxNzEyMDc1ODI2fQ.UasQ-ytoMi4tnxKtm8DKOVZ5zCoh-r1EFZXZ5vBOd-4";
+  //   const decodedToken = jwt.verify(token, process.env.SECRET);
+  //   const newBlog = {
+  //     author: "Mesfin M",
+  //     likes: 2,
+  //     user: decodedToken.id,
+  //   };
+  //   const response = await api
+  //     .post("/api/blogs")
+  //     .set("Authorization", `Bearer ${token}`)
+  //     .send(newBlog)
+  //     .expect(400);
+  //   const blogsAtEnd1 = await helpers.blogsInDb();
+  //   assert.strictEqual(blogsAtEnd1.length, helpers.initialBlogs.length);
 });
 
 // Define an after hook to close the database connection

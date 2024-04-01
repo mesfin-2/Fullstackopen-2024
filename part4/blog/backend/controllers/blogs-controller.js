@@ -41,7 +41,7 @@ const createBlog = async (request, response) => {
   }
 
   if (!title || !url || !author) {
-    return res
+    return response
       .status(400)
       .json({ error: "Title  URL and Author are required" });
   }
@@ -75,7 +75,7 @@ const deleteBlog = async (request, response, next) => {
     const blog = await Blog.findById(id);
     //const user = await User.findById(decodedToken.id);
     const user = request.user;
-    console.log("user-deleter", user.username);
+    console.log("user-delet", user.username);
 
     // Check if the blog exists
     if (!blog) {
