@@ -8,9 +8,7 @@ const blogRouter = require("express").Router();
 
 blogRouter.delete("/:id", blog.deleteBlog);
 blogRouter.get("/", blog.getAllBlogs);
-
 blogRouter.post("/", blog.createBlog);
-
 blogRouter.put("/:id", blog.updateBlog);
 
 module.exports = blogRouter;

@@ -28,13 +28,13 @@ const createBlog = async (request, response) => {
   const decodedToken = jwt.verify(token, process.env.SECRET);
   console.log("id from decoded token", decodedToken.id);
 
-  // if (!decodedToken.id) {
-  //   return response.status(401).json({ error: "Token invalid" });
-  // }
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "Token invalid" });
+  }
 
   // Get  user from the database to assign as the creator of the blog
-  const user = await User.findById(decodedToken.id);
-  console.log("user_id", user);
+  const user = request.user;
+  console.log("username-creator", user.username);
 
   if (!user) {
     return response.status(404).json({ error: "User not found" });
@@ -73,7 +73,9 @@ const deleteBlog = async (request, response, next) => {
     const token = request.token;
     const decodedToken = jwt.verify(token, process.env.SECRET);
     const blog = await Blog.findById(id);
-    const user = await User.findById(decodedToken.id);
+    //const user = await User.findById(decodedToken.id);
+    const user = request.user;
+    console.log("user-deleter", user.username);
 
     // Check if the blog exists
     if (!blog) {

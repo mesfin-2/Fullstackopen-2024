@@ -22,10 +22,15 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
-
+/**
+ Note that it is possible to register a middleware only 
+ for a specific set of routes. So instead of using userExtractor with all the routes,
+ * 
+ */
 app.use(middleware.tokenExtractor);
+//app.use(middleware.userExtractor);
 
-app.use("/api/blogs", blogsRouter);
+app.use("/api/blogs", middleware.userExtractor, blogsRouter);
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
 
