@@ -1,7 +1,13 @@
 import React from "react";
 import Note from "./Note";
 
-const NotesList = ({ onToggleShow, showAll, notesToShow }) => {
+const NotesList = ({
+  onToggleShow,
+  showAll,
+  notesToShow,
+  toggleImportanceOf,
+  deleteNote,
+}) => {
   return (
     <div>
       <h1>Notes</h1>

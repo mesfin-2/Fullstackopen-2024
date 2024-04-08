@@ -1,8 +1,4 @@
-import React, { useState, useEffect } from "react";
-import Note from "./components/Note";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import React, { useState, useEffect, useRef } from "react";
 import noteService from "./services/notes.js";
 import Notification from "./components/Notification.jsx";
 import Footer from "./components/Footer.jsx";
@@ -11,6 +7,7 @@ import LoginForm from "./components/LoginForm.jsx";
 import NoteForm from "./components/NoteForm.jsx";
 import LogOut from "./components/LogOut.jsx";
 import NotesList from "./components/NotesList.jsx";
+import Togglable from "./components/Togglable.jsx";
 
 const App = () => {
   const [notes, setNotes] = useState([]);
@@ -21,6 +18,14 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
+  /*
+  The useRef hook is used to create a noteFormRef reference, that is assigned to the 
+  Togglable component containing the creation note form. The noteFormRef variable acts as a reference to the component.
+   This hook ensures the same reference (ref) that is kept throughout re-renders of the component  
+  */
+
+  const noteFormRef = useRef();
 
   //const navigate = useNavigate();
   useEffect(() => {
@@ -41,14 +46,10 @@ const App = () => {
     }
   }, []);
 
-  const addNote = (e) => {
-    e.preventDefault();
-
+  const addNote = (noteObject) => {
     //add new note
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5, //50% chance being important
-    };
+    noteFormRef.current.toggleVisibility(); //This will make the note form input disapear after a new note added
+
     noteService.create(noteObject).then((returnedNote) => {
       setNotes(notes.concat(returnedNote));
       //setNotes([...notes, returnedNote]);
@@ -56,13 +57,7 @@ const App = () => {
       setTimeout(() => {
         setSuccessMessage(null);
       }, 1000);
-
-      setNewNote("");
-      console.log(newNote);
     });
-  };
-  const onNoteChange = (e) => {
-    setNewNote(e.target.value);
   };
 
   const onToggleShow = () => {
@@ -134,6 +129,8 @@ const App = () => {
   };
 
   const notesToShow = showAll ? notes : notes.filter((note) => note.important);
+  //const hideWhenVisible = { display: loginVisible ? "none" : "" };
+  //const showWhenVisible = { display: loginVisible ? "" : "none" };
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -143,6 +140,7 @@ const App = () => {
         username,
         password,
       });
+      console.log("name", user.username);
       window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user));
       noteService.setToken(user.token);
       setUser(user);
@@ -170,24 +168,23 @@ const App = () => {
       {errorMessage && <Notification errormessage={errorMessage} />}
       {successMessage && <Notification successmessage={successMessage} />}
 
-      <h1>Login</h1>
       {user === null ? (
-        <LoginForm
-          username={username}
-          password={password}
-          setUsername={setUsername}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-        />
+        <Togglable buttonLabel="Login">
+          <LoginForm
+            username={username}
+            password={password}
+            setUsername={setUsername}
+            setPassword={setPassword}
+            handleLogin={handleLogin}
+          />
+        </Togglable>
       ) : (
         <div>
-          <p>Welocome - {user.name} </p>
-          <LogOut handleLogOut={handleLogOut} />
-          <NoteForm
-            newNote={newNote}
-            onNoteChange={onNoteChange}
-            addNote={addNote}
-          />
+          <p>Welocome - {user.username} </p>
+          <Togglable buttonLabel="new note" ref={noteFormRef}>
+            <LogOut handleLogOut={handleLogOut} />
+            <NoteForm createNote={addNote} />
+          </Togglable>
         </div>
       )}
 
@@ -195,6 +192,8 @@ const App = () => {
         onToggleShow={onToggleShow}
         showAll={showAll}
         notesToShow={notesToShow}
+        deleteNote={deleteNote}
+        toggleImportanceOf={toggleImportanceOf}
       />
       <Footer />
     </div>
