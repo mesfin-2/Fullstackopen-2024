@@ -1,6 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 
-const BlogForm = ({ formData, handleInputChange, addBlog }) => {
+const BlogForm = ({ createBlog }) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    author: "",
+    url: "",
+    likes: 0,
+  });
+  const [updateForm, setUpdateForm] = useState(false);
+
+  const addBlog = (e) => {
+    e.preventDefault();
+    //add new Blog Post
+    createBlog({
+      title: formData.title,
+      author: formData.author,
+      url: formData.url,
+      likes: formData.likes,
+    });
+    setFormData({
+      title: "",
+      author: "",
+      url: "",
+      likes: 0,
+    });
+  };
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  //update blog likes
+  const updateLikes333 = async (id, updatedLikes) => {};
   return (
     <div>
       <form onSubmit={addBlog}>

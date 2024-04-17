@@ -22,4 +22,15 @@ const create = async (newObject) => {
   return response.data;
 };
 
-export default { getAll, setToken, create };
+// const updateLikes = async (id, updatedLikes) => {
+//   // const config = {
+//   //   headers: { Authorization: token },
+//   // };
+//   const response = await axios.put(`${baseUrl}/${id}`, updatedLikes);
+//   return response.data;
+// };
+const updateLikes = async (id, newBlog) => {
+  const request = axios.put(`${baseUrl}/${id}`, newBlog);
+  return request.then((res) => res.data);
+};
+export default { getAll, setToken, create, updateLikes };

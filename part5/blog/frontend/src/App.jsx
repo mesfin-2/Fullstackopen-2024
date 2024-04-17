@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import Blog from "./components/Blog";
+import { useState, useEffect, useRef } from "react";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import LoginForm from "./components/LoginForm";
@@ -7,20 +6,19 @@ import BlogForm from "./components/BlogForm";
 import LogOut from "./components/LogOut";
 import Notification from "./components/Notification";
 import "./index.css";
+import BlogList from "./components/BlogList";
+import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [formData, setFormData] = useState({
-    title: "",
-    author: "",
-    url: "",
-    likes: 0,
-  });
+
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+
+  const blogFormRef = useRef();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -35,39 +33,36 @@ const App = () => {
     }
   }, []);
 
-  const addBlog = (e) => {
-    e.preventDefault();
+  const addBlog = (blogObject) => {
+    blogFormRef.current.toggleVisibility();
 
-    //add new Blog Post
-    const blogObject = {
-      title: formData.title,
-      author: formData.author,
-      url: formData.url,
-      likes: formData.likes,
-    };
-    blogService.create(blogObject).then((returnedNote) => {
-      setBlogs(blogs.concat(returnedNote));
+    blogService.create(blogObject).then((returnedBlog) => {
+      setBlogs(blogs.concat(returnedBlog));
 
       setSuccessMessage(`blog created successfully  ${blogObject.title}`);
       setTimeout(() => {
         setSuccessMessage(null);
       }, 1000);
-
-      setFormData({
-        title: "",
-        author: "",
-        url: "",
-        likes: 0,
-      });
-      console.log(formData);
     });
   };
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+
+  //Update likes
+
+  // const update = async (blog) => {
+  //   const updatedBlog = await blogService.updateLikes(blog.id, {
+  //     ...blog,
+  //     likes: blog.likes + 1,
+  //   });
+  //   setBlogs(blogs.map((b) => (b.id !== blog.id ? b : updatedBlog)));
+  // };
+  const update = async (blog) => {
+    console.log("beforeUpdateBlog", blogs);
+    const updatedBlog = await blogService.updateLikes(blog.id, {
+      ...blog,
+      likes: blog.likes + 1,
     });
+    setBlogs(blogs.map((b) => (b.id !== blog.id ? b : updatedBlog)));
+    console.log("afterUpdateBlog", blogs);
   };
 
   const handleLogin = async (e) => {
@@ -103,30 +98,27 @@ const App = () => {
     <div>
       {errorMessage && <Notification errormessage={errorMessage} />}
       {successMessage && <Notification successmessage={successMessage} />}
-      <h1>Login</h1>
+
       {user === null ? (
-        <LoginForm
-          username={username}
-          password={password}
-          setUsername={setUsername}
-          setPassword={setPassword}
-          handleLogin={handleLogin}
-        />
+        <Togglable buttonLabel="Login">
+          <LoginForm
+            username={username}
+            password={password}
+            setUsername={setUsername}
+            setPassword={setPassword}
+            handleLogin={handleLogin}
+          />
+        </Togglable>
       ) : (
         <div>
           <p>Welocome - {user.name} </p>
-          <LogOut handleLogOut={handleLogOut} />
-          <BlogForm
-            formData={formData}
-            handleInputChange={handleInputChange}
-            addBlog={addBlog}
-          />
+          <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+            <LogOut handleLogOut={handleLogOut} />
+            <BlogForm createBlog={addBlog} />
+          </Togglable>
         </div>
       )}
-      <h2>blogs</h2>
-      {blogs?.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+      <BlogList blogs={blogs} update={update} />
     </div>
   );
 };
