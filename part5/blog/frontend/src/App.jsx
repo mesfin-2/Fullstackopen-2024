@@ -65,6 +65,7 @@ const App = () => {
     console.log("afterUpdateBlog", blogs);
   };
 
+  //handle login
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
