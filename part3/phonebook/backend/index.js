@@ -1,4 +1,5 @@
 require("dotenv").config();
+const config = require("./utils/config");
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -119,8 +120,12 @@ const errorHandler = (error, request, response, next) => {
 };
 app.use(errorHandler);
 
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-  console.log(`server Running at port ${PORT}`);
+//const PORT = process.env.PORT;
+console.log("PORT", config.PORT);
+app.listen(config.PORT, () => {
+  console.log(`server Running at port ${config.PORT}`);
   //res.status(200).json(`<h2>Serving running ${PORT}</h2>`);
 });
+
+
+

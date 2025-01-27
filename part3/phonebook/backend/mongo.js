@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const config = require("./utils/config");
+
 
 //console.log(process.argv[2] === process.argv[2]);
 if (process.argv.length < 3) {
@@ -7,11 +9,15 @@ if (process.argv.length < 3) {
 }
 
 //command line parameter
-const password = process.argv[2];
+//const password = process.argv[2];
+//console.log("password", password);
 const name = process.argv[3];
+//console.log("name", name);
 const number = process.argv[4];
 
-const url = `mongodb+srv://user:${password}@persons.g1yuq2z.mongodb.net/phonebook`;
+//const url = `mongodb+srv://user:${password}@persons.v2w9w.mongodb.net/phonebook`;
+//const url = "mongodb+srv://user:user@cluster0.v2w9w.mongodb.net/";
+const url = config.MONGODB_URI;
 
 mongoose.set("strictQuery", false);
 
